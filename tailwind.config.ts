@@ -60,6 +60,9 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        // Aqui esta el color personalizado
+        'custom-green': '#00a73b', // verde tecmilenio (panel de registro)
+        'admin-blue': '#14095d', // azul oscuro (panel de administrador)
       },
       keyframes: {
         'accordion-down': {
