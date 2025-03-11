@@ -38,6 +38,8 @@
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.49.1",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
@@ -67,5 +69,6 @@
     "typescript": "5.2.2",
     "vaul": "^0.9.9",
     "zod": "^3.23.8"
-  }
+  },
+  "packageManager": "yarn@3.2.3+sha512.f26f951f67de0c6a33ee381e5ff364709c87e70eb5e65c694e4facde3512f1fa80b8679e6ba31ce7d340fbb46f08dd683af9457e240f25a204be7427940d767e"
 }

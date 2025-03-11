@@ -23,6 +23,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { createClient } from '@supabase/supabase-js';
+
+// Crear cliente de Supabase
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const formSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -47,14 +54,32 @@ export default function RegistrationForm() {
     },
   });
 
+  // Función para manejar el envío del formulario
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // Here you would typically make an API call to save the data
-      console.log(values);
+      // Inserta los datos en Supabase
+      const { error } = await supabase
+        .from('RegistroTecmi')  // Nombre de la tabla
+        .insert([
+          {
+            name: values.name,
+            matricula: values.matricula,
+            semester: values.semester,
+            career: values.career,
+            campus: values.campus,
+          }
+        ]);
+  
+      if (error) {
+        throw error;
+      }
+  
+      // Si no hubo errores, muestra el mensaje de éxito
       toast.success('¡Registro exitoso! Estás participando en la rifa');
-      form.reset();
+      form.reset();  // Limpiar el formulario
     } catch (error) {
+      // Muestra el mensaje de error si algo salió mal
       toast.error('Error al registrar. Por favor intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
