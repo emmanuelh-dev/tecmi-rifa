@@ -8,7 +8,7 @@ export default function Home() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Feria de Empleo Tecmilenio</h1>
-          <p className="text-lg text-gray-600">Registra tus datos para participar en nuestra rifa</p>
+          <p className="text-lg text-gray-600">Registra tus datos para participar en nuestra rifa de la feria de empleo</p>
         </div>
         
         <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
