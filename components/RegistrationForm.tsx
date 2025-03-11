@@ -26,9 +26,9 @@ import { toast } from 'sonner';
 
 const formSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-  matricula: z.string().min(5, 'La matrícula debe tener al menos 5 caracteres'),
+  matricula: z.string().min(10, 'La matrícula debe tener al menos 10 caracteres'),
   semester: z.string().transform((val) => parseInt(val, 10))
-    .refine((val) => val >= 1 && val <= 12, 'El semestre debe estar entre 1 y 12'),
+    .refine((val) => val >= 1 && val <= 8, 'El semestre debe estar entre 1 y 8'),
   career: z.string().min(1, 'Selecciona una carrera'),
   campus: z.string().min(1, 'Selecciona un campus'),
 });
@@ -71,7 +71,7 @@ export default function RegistrationForm() {
             <FormItem>
               <FormLabel>Nombre Completo</FormLabel>
               <FormControl>
-                <Input placeholder="Juan Pérez" {...field} />
+                <Input placeholder="Juan Diego Rodriguez Franco" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,7 +85,7 @@ export default function RegistrationForm() {
             <FormItem>
               <FormLabel>Matrícula</FormLabel>
               <FormControl>
-                <Input placeholder="A12345" {...field} />
+                <Input placeholder="AL02135046" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,9 +97,9 @@ export default function RegistrationForm() {
           name="semester"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Semestre</FormLabel>
+              <FormLabel>Semestre que se cursa actualmente.</FormLabel>
               <FormControl>
-                <Input type="number" min="1" max="12" placeholder="1" {...field} />
+                <Input type="number" min="1" max="8" placeholder="1" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -140,7 +140,7 @@ export default function RegistrationForm() {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona tu campus" />
+                    <SelectValue placeholder="Selecciona tu campus al que perteneces" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
