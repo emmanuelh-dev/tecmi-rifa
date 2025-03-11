@@ -41,7 +41,7 @@ export default function RegistrationForm() {
     defaultValues: {
       name: '',
       matricula: '',
-      semester: '',
+      semester: 1,
       career: '',
       campus: '',
     },
