@@ -25,12 +25,17 @@ import {
 import { toast } from 'sonner';
 
 const formSchema = z.object({
+  userType: z.enum(['student', 'alumni'], {
+    required_error: 'Selecciona el tipo de usuario',
+  }),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   matricula: z.string().min(10, 'La matrícula debe tener al menos 10 caracteres'),
   semester: z.string().transform((val) => parseInt(val, 10))
     .refine((val) => val >= 1 && val <= 8, 'El semestre debe estar entre 1 y 8'),
   career: z.string().min(1, 'Selecciona una carrera'),
   campus: z.string().min(1, 'Selecciona un campus'),
+  whatsapp: z.string().optional(),
+  email: z.string().email('Ingresa un correo electrónico válido').optional(),
 });
 
 export default function RegistrationForm() {
@@ -41,9 +46,12 @@ export default function RegistrationForm() {
     defaultValues: {
       name: '',
       matricula: '',
+      userType: 'student',
       semester: 1,
       career: '',
       campus: '',
+      whatsapp: '',
+      email: '',
     },
   });
 
@@ -61,9 +69,32 @@ export default function RegistrationForm() {
     }
   }
 
+  const userType = form.watch('userType');
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="userType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo de Usuario</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el tipo de usuario" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="student">Estudiante</SelectItem>
+                  <SelectItem value="alumni">ExaTecmi</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="name"
@@ -77,6 +108,37 @@ export default function RegistrationForm() {
             </FormItem>
           )}
         />
+   {userType === 'alumni' && (
+          <>
+            <FormField
+              control={form.control}
+              name="whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>WhatsApp</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+52 1234567890" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Correo Electrónico Personal</FormLabel>
+                  <FormControl>
+                    <Input placeholder="correo@ejemplo.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
 
         <FormField
           control={form.control}
@@ -92,19 +154,21 @@ export default function RegistrationForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="semester"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Semestre que se cursa actualmente.</FormLabel>
-              <FormControl>
-                <Input type="number" min="1" max="8" placeholder="1" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {userType === 'student' && (
+          <FormField
+            control={form.control}
+            name="semester"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Semestre que se cursa actualmente.</FormLabel>
+                <FormControl>
+                  <Input type="number" min="1" max="8" placeholder="1" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
@@ -156,6 +220,7 @@ export default function RegistrationForm() {
           )}
         />
 
+     
         <Button
           type="submit"
           className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
