@@ -156,7 +156,11 @@ export default function RegistrationForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? 'Registrando...' : 'Registrar'}
         </Button>
       </form>

@@ -31,15 +31,15 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-admin-blue py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Panel de Administrador</h1>
-          <p className="text-lg text-gray-600">Selección de ganadores de la rifa</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
+          <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
         </div>
 
         <div className="grid gap-6 mb-8 md:grid-cols-2">
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Participantes</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -52,7 +52,7 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Premios Entregados</CardTitle>
               <Gift className="h-4 w-4 text-muted-foreground" />
@@ -66,7 +66,7 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        <Card className="mb-8">
+        <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
           <CardHeader>
             <CardTitle>Seleccionar Ganador</CardTitle>
           </CardHeader>
@@ -75,7 +75,7 @@ export default function AdminPage() {
               size="lg"
               onClick={selectRandomWinner}
               disabled={isSelecting}
-              className="mb-6"
+              className="mb-6 bg-admin-blue text-white hover:bg-opacity-90"
             >
               {isSelecting ? 'Seleccionando...' : 'Seleccionar Ganador Aleatorio'}
             </Button>
