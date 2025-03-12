@@ -10,7 +10,7 @@ export default function Home() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Feria de Empleo Tecmilenio</h1>
           <p className="text-lg text-gray-100">
-          Registra tus datos para participar en nuestra rifa y ganar un premio',
+          Registra tus datos para participar en nuestra rifa y ganar un premio
           </p>
         </div>
         
