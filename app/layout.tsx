@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Feria del Empleo Tecmilenio',
+  title: 'Feria de Empleo Tecmilenio Campus San Nicolás',
   description: 'Registra tus datos para participar en nuestra rifa y ganar un premio',
   openGraph: {
     title: 'Feria del Empleo Tecmilenio',
