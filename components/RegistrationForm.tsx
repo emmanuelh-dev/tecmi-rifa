@@ -30,7 +30,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+//AQUI ERA EL ERRO DE LAS VALIDACIO----------------------------------------------------------------------------------------------------
 const formSchema = z.object({
   userType: z.enum(['student', 'alumni'], {
     required_error: 'Selecciona el tipo de usuario',
@@ -41,9 +41,39 @@ const formSchema = z.object({
     .refine((val) => val >= 1 && val <= 8, 'El semestre debe estar entre 1 y 8'),
   career: z.string().min(1, 'Selecciona una carrera'),
   campus: z.string().min(1, 'Selecciona un campus'),
-  whatsapp: z.string().optional(),
-  email: z.string().email('Ingresa un correo electrónico válido').optional(),
-});
+  whatsapp: z.string().optional(), // WhatsApp es opcional por defecto
+  email: z.string().optional(), // Email es opcional por defecto
+})
+  .superRefine((data, ctx) => {
+    // Validación condicional para alumni
+    if (data.userType === 'alumni') {
+      // Validación de WhatsApp
+      if (!data.whatsapp || data.whatsapp.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'WhatsApp es obligatorio para exalumnos',
+          path: ['whatsapp'],
+        });
+      }
+
+      // Validación de correo electrónico
+      if (!data.email || data.email.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Correo electrónico es obligatorio para exalumnos',
+          path: ['email'],
+        });
+      } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Ingresa un correo electrónico válido',
+          path: ['email'],
+        });
+      }
+    }
+  });
+//-------------------------------------------------------------------------------
+
 
 export default function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,16 +98,19 @@ export default function RegistrationForm() {
     try {
       // Inserta los datos en Supabase
       const { error } = await supabase
-        .from('RegistroTecmi')  // Nombre de la tabla
-        .insert([
-          {
-            name: values.name,
-            matricula: values.matricula,
-            semester: values.semester,
-            career: values.career,
-            campus: values.campus,
-          }
-        ]);
+      .from('RegistroTecmi')
+      .insert([
+        {
+          name: values.name,
+          matricula: values.matricula,
+          semester: values.semester,
+          career: values.career,
+          campus: values.campus,
+          userType: values.userType, // Se agrega userType
+          whatsapp: values.whatsapp || null, // Si está vacío, se guarda como NULL
+          email: values.email || null, // Si está vacío, se guarda como NULL
+        }
+      ]);
   
       if (error) {
         throw error;
@@ -244,8 +277,6 @@ export default function RegistrationForm() {
             </FormItem>
           )}
         />
-
-     
         <Button
           type="submit"
           className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
