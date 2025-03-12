@@ -1,5 +1,6 @@
 import RegistrationForm from '@/components/RegistrationForm';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Home() {
@@ -9,14 +10,22 @@ export default function Home() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Feria de Empleo Tecmilenio</h1>
           <p className="text-lg text-gray-100">
-            Registra tus datos para participar en nuestra rifa de la feria de empleo
+          Registra tus datos para participar en nuestra rifa y ganar un premio',
           </p>
         </div>
         
         <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
           <RegistrationForm />
         </div>
-
+       <div className='bg-white rounded-lg mt-8 overflow-hidden'>
+       <Image
+          src="/feria.jpg"
+          alt="Empresas"
+          width={400}
+          height={400}
+          className="mx-auto"
+        />
+       </div>
         <div className="mt-8 text-center">
           <Link href="/admin">
             <Button variant="outline" className="bg-white text-custom-green hover:bg-black-100">

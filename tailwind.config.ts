@@ -61,7 +61,7 @@ const config: Config = {
           '5': 'hsl(var(--chart-5))',
         },
         // Aqui esta el color personalizado
-        'custom-green': '#00534c', // verde tecmilenio (panel de registro)
+        'custom-green': '#084F49', // verde tecmilenio (panel de registro) 
         'admin-blue': '#14095d', // azul oscuro (panel de administrador)
       },
       keyframes: {
