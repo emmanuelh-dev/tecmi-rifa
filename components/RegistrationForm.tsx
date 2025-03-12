@@ -37,41 +37,43 @@ const formSchema = z.object({
   }),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   matricula: z.string().min(10, 'La matrícula debe tener al menos 10 caracteres'),
-  semester: z.string().transform((val) => parseInt(val, 10))
-    .refine((val) => val >= 1 && val <= 8, 'El semestre debe estar entre 1 y 8'),
+  semester: z.number()
+    .min(1, 'El semestre debe estar entre 1 y 8')
+    .max(8, 'El semestre debe estar entre 1 y 8'),
   career: z.string().min(1, 'Selecciona una carrera'),
   campus: z.string().min(1, 'Selecciona un campus'),
   whatsapp: z.string().optional(), // WhatsApp es opcional por defecto
   email: z.string().optional(), // Email es opcional por defecto
 })
-  .superRefine((data, ctx) => {
-    // Validación condicional para alumni
-    if (data.userType === 'alumni') {
-      // Validación de WhatsApp
-      if (!data.whatsapp || data.whatsapp.trim() === '') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'WhatsApp es obligatorio para exalumnos',
-          path: ['whatsapp'],
-        });
-      }
-
-      // Validación de correo electrónico
-      if (!data.email || data.email.trim() === '') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Correo electrónico es obligatorio para exalumnos',
-          path: ['email'],
-        });
-      } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Ingresa un correo electrónico válido',
-          path: ['email'],
-        });
-      }
+.superRefine((data, ctx) => {
+  // Validación condicional para alumni
+  if (data.userType === 'alumni') {
+    // Validación de WhatsApp
+    if (!data.whatsapp || data.whatsapp.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'WhatsApp es obligatorio para exalumnos',
+        path: ['whatsapp'],
+      });
     }
-  });
+
+    // Validación de correo electrónico
+    if (!data.email || data.email.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Correo electrónico es obligatorio para exalumnos',
+        path: ['email'],
+      });
+    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Ingresa un correo electrónico válido',
+        path: ['email'],
+      });
+    }
+  }
+});
+
 //-------------------------------------------------------------------------------
 
 
@@ -277,6 +279,8 @@ export default function RegistrationForm() {
             </FormItem>
           )}
         />
+
+<pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
         <Button
           type="submit"
           className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
