@@ -8,7 +8,7 @@ export default function Home() {
     <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Feria de Empleo Tecmilenio</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Feria de Empleo Tecmilenio Campus San Nicolás</h1>
           <p className="text-lg text-gray-100">
           Registra tus datos para participar en nuestra rifa y ganar un premio
           </p>
@@ -23,7 +23,7 @@ export default function Home() {
           alt="Empresas"
           width={400}
           height={400}
-          className="mx-auto"
+          className="mx-auto w-full"
         />
        </div>
         <div className="mt-8 text-center">
