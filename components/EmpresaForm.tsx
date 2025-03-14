@@ -24,7 +24,10 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { createClient } from '@supabase/supabase-js';
+<<<<<<< HEAD
 import { X } from 'lucide-react';
+=======
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
 
 // Crear cliente de Supabase
 const supabase = createClient(
@@ -32,7 +35,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+<<<<<<< HEAD
 // Esquema de validación
+=======
+
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
 const formSchema = z.object({
   nombreColaborador: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   nombreEmpresa: z.string().min(2, 'El nombre de la empresa debe tener al menos 2 caracteres'),
@@ -55,20 +62,30 @@ export default function EmpresaRegistrationForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
+<<<<<<< HEAD
       console.log('📤 Enviando datos a Supabase:', values);
 
       // Inserta los datos en Supabase
       const { data, error } = await supabase
+=======
+      // Inserta los datos en Supabase
+      const { error } = await supabase
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
         .from('RegistroEmpresas')
         .insert([
           {
             nombreColaborador: values.nombreColaborador,
             nombreEmpresa: values.nombreEmpresa,
+<<<<<<< HEAD
             carreraBuscada: JSON.stringify(values.carrerasBuscadas), // Convertir a string JSON
+=======
+            carreras: values.carrerasBuscadas, 
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
           },
         ]);
 
       if (error) {
+<<<<<<< HEAD
         console.error('❌ Error al insertar en Supabase:', error);
         toast.error(`Error: ${error.message}`);
         throw error;
@@ -80,11 +97,23 @@ export default function EmpresaRegistrationForm() {
     } catch (error) {
       console.error('⚠️ Error general:', error);
       toast.error('Error inesperado, revisa la consola.');
+=======
+        throw error;
+      }
+
+      // Si no hubo errores, muestra el mensaje de éxito
+      toast.success('¡Registro exitoso! La empresa ha sido registrada.');
+      form.reset(); // Limpiar el formulario
+    } catch (error) {
+      // Muestra el mensaje de error si algo salió mal
+      toast.error('Error al registrar. Por favor intenta de nuevo.');
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
     } finally {
       setIsSubmitting(false);
     }
   }
 
+<<<<<<< HEAD
   // Función para quitar una carrera
   const handleRemoveCareer = (carreraId: string) => {
     const carrerasActuales = form.getValues('carrerasBuscadas');
@@ -96,6 +125,11 @@ export default function EmpresaRegistrationForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Nombre del colaborador */}
+=======
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
         <FormField
           control={form.control}
           name="nombreColaborador"
@@ -109,8 +143,11 @@ export default function EmpresaRegistrationForm() {
             </FormItem>
           )}
         />
+<<<<<<< HEAD
 
         {/* Nombre de la empresa */}
+=======
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
         <FormField
           control={form.control}
           name="nombreEmpresa"
@@ -124,8 +161,11 @@ export default function EmpresaRegistrationForm() {
             </FormItem>
           )}
         />
+<<<<<<< HEAD
 
         {/* Carreras buscadas */}
+=======
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
         <FormField
           control={form.control}
           name="carrerasBuscadas"
@@ -134,6 +174,10 @@ export default function EmpresaRegistrationForm() {
               <FormLabel>Carreras buscadas</FormLabel>
               <Select
                 onValueChange={(value) => {
+<<<<<<< HEAD
+=======
+                  // Agregar la carrera seleccionada al array
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
                   const nuevasCarreras = [...field.value, value];
                   field.onChange(nuevasCarreras);
                 }}
@@ -152,11 +196,16 @@ export default function EmpresaRegistrationForm() {
                 </SelectContent>
               </Select>
               <FormMessage />
+<<<<<<< HEAD
               {/* Mostrar carreras seleccionadas con botón de eliminar */}
+=======
+              {/* Mostrar las carreras seleccionadas */}
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
               <div className="mt-2">
                 {field.value.map((carreraId) => {
                   const carrera = CAREERS.find((c) => c.id === carreraId);
                   return (
+<<<<<<< HEAD
                     <div
                       key={carreraId}
                       className="flex items-center justify-between bg-gray-100 p-2 rounded-md mb-2"
@@ -169,6 +218,10 @@ export default function EmpresaRegistrationForm() {
                       >
                         <X className="h-4 w-4" />
                       </button>
+=======
+                    <div key={carreraId} className="bg-gray-100 p-2 rounded-md">
+                      {carrera?.name}
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
                     </div>
                   );
                 })}
@@ -188,4 +241,8 @@ export default function EmpresaRegistrationForm() {
       </form>
     </Form>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92

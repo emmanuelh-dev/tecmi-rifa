@@ -9,7 +9,11 @@ import { createClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
+<<<<<<< HEAD
 import Link from 'next/link'; // Importa Link para redireccionar
+=======
+import Link from 'next/link'; 
+>>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
 
 // Define a type for student data
 interface Student {
