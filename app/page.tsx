@@ -25,7 +25,7 @@ export default function Home() {
               alt="Empresas"
               width={400}
               height={400}
-              className="mx-auto"
+              className="w-full mx-auto"
             />
           </div>
 
@@ -41,7 +41,7 @@ export default function Home() {
 
       {/* Footer con color #14095D */}
       <footer className="bg-[#14095D] text-white py-4 text-center shadow-md">
-        <p className="text-sm font-medium">Creado por: María Fernanda, Emmanuel, Valeria y Gerson</p>
+        <p className="text-sm font-medium">Creado con ❤️ por <a href="https://bysmax.com" target='_blank' className='font-bold '>bysmax</a>:  María Fernanda, Emmanuel, Valeria y Gerson</p>
       </footer>
     </div>
   );
