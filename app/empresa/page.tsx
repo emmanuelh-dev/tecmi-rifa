@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 import EmpresaForm from '../../components/EmpresaForm'; 
-=======
 import EmpresaForm from '@/components/EmpresaForm';
->>>>>>> 64fac77e49b8d0b88e96d11c6f4aa975a4aabf92
+import EmpresaForm from '@/components/EmpresaForm';
 
 export default function EmpresaPage() {
   return (

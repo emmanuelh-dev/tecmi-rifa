@@ -280,7 +280,6 @@ export default function RegistrationForm() {
           )}
         />
 
-<pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
         <Button
           type="submit"
           className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
@@ -290,5 +289,7 @@ export default function RegistrationForm() {
         </Button>
       </form>
     </Form>
+
+    
   );
 }
