@@ -25,12 +25,11 @@ import {
 import { toast } from 'sonner';
 import { createClient } from '@supabase/supabase-js';
 
-// Crear cliente de Supabase
+// Crear cliente de Supabase fuera del componente
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
 
 const formSchema = z.object({
   nombreColaborador: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -54,14 +53,19 @@ export default function EmpresaRegistrationForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // Inserta los datos en Supabase
+      console.log("Datos a enviar:", values); // Verifica los datos
+
+      // Convertir el array de carreras a un string separado por comas
+      const carrerasTexto = values.carrerasBuscadas.join(',');
+
       const { error } = await supabase
         .from('RegistroEmpresas')
         .insert([
           {
             nombreColaborador: values.nombreColaborador,
             nombreEmpresa: values.nombreEmpresa,
-            carreras: values.carrerasBuscadas, 
+            carreraBuscada: carrerasTexto, // Usar carreraBuscada (singular)
+            tipoUsuario: 'empresa', // Incluir tipoUsuario (ajusta el valor según sea necesario)
           },
         ]);
 
@@ -69,16 +73,21 @@ export default function EmpresaRegistrationForm() {
         throw error;
       }
 
-      // Si no hubo errores, muestra el mensaje de éxito
       toast.success('¡Registro exitoso! La empresa ha sido registrada.');
       form.reset(); // Limpiar el formulario
     } catch (error) {
-      // Muestra el mensaje de error si algo salió mal
+      console.error("Error al registrar:", error); // Muestra el error en la consola
       toast.error('Error al registrar. Por favor intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
   }
+
+  // Función para eliminar una carrera del array
+  const handleRemoveCareer = (careerId: string, field: any) => {
+    const nuevasCarreras = field.value.filter((id: string) => id !== careerId);
+    field.onChange(nuevasCarreras);
+  };
 
   return (
     <Form {...form}>
@@ -141,8 +150,15 @@ export default function EmpresaRegistrationForm() {
                 {field.value.map((carreraId) => {
                   const carrera = CAREERS.find((c) => c.id === carreraId);
                   return (
-                    <div key={carreraId} className="bg-gray-100 p-2 rounded-md">
-                      {carrera?.name}
+                    <div key={carreraId} className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
+                      <span>{carrera?.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => handleRemoveCareer(carreraId, field)}
+                      >
+                        Eliminar
+                      </Button>
                     </div>
                   );
                 })}
