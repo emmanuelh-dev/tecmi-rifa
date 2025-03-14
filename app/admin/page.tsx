@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
+import Link from 'next/link'; // Importa Link para redireccionar
 
 // Define a type for student data
 interface Student {
@@ -156,9 +157,17 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-admin-blue py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
-          <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
+        {/* Encabezado con título y botón de Registro de Empresas */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
+            <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
+          </div>
+          <Link href="/empresa">
+            <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
+              Registro de Empresas
+            </Button>
+          </Link>
         </div>
 
         {/* Charts Section */}
