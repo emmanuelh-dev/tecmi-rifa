@@ -9,7 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
-import Link from 'next/link'; 
+import Link from 'next/link';
 
 // Define a type for student data
 interface Student {
@@ -21,6 +21,14 @@ interface Student {
   userType: 'student' | 'alumni';
 }
 
+// Define a type for empresa data
+interface Empresa {
+  created_at: string;
+  nombreColaborador: string;
+  nombreEmpresa: string;
+  carreraBuscada: string;
+}
+
 // Define colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
 
@@ -28,6 +36,7 @@ export default function AdminPage() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +77,37 @@ export default function AdminPage() {
     };
     
     fetchStudents();
+  }, []);
+
+  // Load empresas data from Supabase
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const supabase = createClient();
+        console.log('Iniciando consulta a Supabase...'); // Depuración
+
+        const { data, error } = await supabase
+          .from('RegistroEmpresas') // Nombre de la tabla en Supabase
+          .select('*');
+
+        if (error) {
+          console.error('Error en la consulta:', error); // Depuración
+          throw error;
+        }
+
+        if (data) {
+          console.log('Datos de empresas:', data); // Depuración
+          setEmpresas(data as Empresa[]);
+        } else {
+          console.log('No se encontraron datos en la tabla.'); // Depuración
+        }
+      } catch (err) {
+        console.error('Error fetching empresas:', err);
+        toast.error('Error al cargar las empresas');
+      }
+    };
+
+    fetchEmpresas();
   }, []);
 
   // Process data for charts
@@ -158,9 +198,9 @@ export default function AdminPage() {
     <div className="min-h-screen bg-admin-blue py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Encabezado con título y botón de Registro de Empresas */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
             <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
           </div>
           <Link href="/empresa">
@@ -171,7 +211,7 @@ export default function AdminPage() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-6 mb-8 md:grid-cols-3">
+        <div className="grid gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3">
           {/* Campus Distribution Chart */}
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -303,7 +343,8 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        <div className="grid gap-6 mb-8 md:grid-cols-2">
+        <div className="grid gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3">
+          {/* Total de Participantes */}
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Participantes</CardTitle>
@@ -316,7 +357,22 @@ export default function AdminPage() {
               </p>
             </CardContent>
           </Card>
-          
+
+          {/* Total de Empresas */}
+          <Card className="bg-white border border-gray-200 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Empresas</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{empresas.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Empresas registradas
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Estado */}
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Estado</CardTitle>
@@ -361,6 +417,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
+        {/* Lista de Participantes */}
         <Card className="bg-white border border-gray-200 shadow-lg">
           <CardHeader>
             <CardTitle>Lista de Participantes</CardTitle>
@@ -385,6 +442,35 @@ export default function AdminPage() {
                       <td className="py-2 px-4">{student.career}</td>
                       <td className="py-2 px-4">{student.campus}</td>
                       <td className="py-2 px-4">{student.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Empresas Registradas */}
+        <Card className="bg-white border border-gray-200 shadow-lg mt-6">
+          <CardHeader>
+            <CardTitle>Lista De Empresas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Nombre Colaborador</th>
+                    <th className="text-left py-3 px-4">Nombre Empresa</th>
+                    <th className="text-left py-3 px-4">Carrera Buscada</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {empresas.map((empresa) => (
+                    <tr key={empresa.created_at} className="border-b hover:bg-gray-50">
+                      <td className="py-2 px-4">{empresa.nombreColaborador}</td>
+                      <td className="py-2 px-4">{empresa.nombreEmpresa}</td>
+                      <td className="py-2 px-4">{empresa.carreraBuscada}</td>
                     </tr>
                   ))}
                 </tbody>
