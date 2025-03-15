@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 // Crear cliente de Supabase
 const supabase = createClient(
@@ -79,6 +80,7 @@ const formSchema = z.object({
 
 export default function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,29 +102,30 @@ export default function RegistrationForm() {
     try {
       // Inserta los datos en Supabase
       const { error } = await supabase
-      .from('RegistroTecmi')
-      .insert([
-        {
-          name: values.name,
-          matricula: values.matricula,
-          semester: values.semester,
-          career: values.career,
-          campus: values.campus,
-          userType: values.userType, // Se agrega userType
-          whatsapp: values.whatsapp || null, // Si está vacío, se guarda como NULL
-          email: values.email || null, // Si está vacío, se guarda como NULL
-        }
-      ]);
-  
+        .from('RegistroTecmi')
+        .insert([
+          {
+            name: values.name,
+            matricula: values.matricula,
+            semester: values.semester,
+            career: values.career,
+            campus: values.campus,
+            userType: values.userType, // Se agrega userType
+            whatsapp: values.whatsapp || null, // Si está vacío, se guarda como NULL
+            email: values.email || null, // Si está vacío, se guarda como NULL
+          },
+        ]);
+
       if (error) {
         throw error;
       }
-  
-      // Si no hubo errores, muestra el mensaje de éxito
+
+      localStorage.setItem('userCareer', values.career);
+      router.push('/ofertaTrabajo'); // Redirige al usuario a la página de ofertas de empleo
+
       toast.success('¡Registro exitoso! Estás participando en la rifa');
-      form.reset();  // Limpiar el formulario
+      form.reset();
     } catch (error) {
-      // Muestra el mensaje de error si algo salió mal
       toast.error('Error al registrar. Por favor intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
