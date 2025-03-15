@@ -46,34 +46,34 @@ const formSchema = z.object({
   whatsapp: z.string().optional(), // WhatsApp es opcional por defecto
   email: z.string().optional(), // Email es opcional por defecto
 })
-.superRefine((data, ctx) => {
-  // Validación condicional para alumni
-  if (data.userType === 'alumni') {
-    // Validación de WhatsApp
-    if (!data.whatsapp || data.whatsapp.trim() === '') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'WhatsApp es obligatorio para exalumnos',
-        path: ['whatsapp'],
-      });
-    }
+  .superRefine((data, ctx) => {
+    // Validación condicional para alumni
+    if (data.userType === 'alumni') {
+      // Validación de WhatsApp
+      if (!data.whatsapp || data.whatsapp.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'WhatsApp es obligatorio para exalumnos',
+          path: ['whatsapp'],
+        });
+      }
 
-    // Validación de correo electrónico
-    if (!data.email || data.email.trim() === '') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Correo electrónico es obligatorio para exalumnos',
-        path: ['email'],
-      });
-    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Ingresa un correo electrónico válido',
-        path: ['email'],
-      });
+      // Validación de correo electrónico
+      if (!data.email || data.email.trim() === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Correo electrónico es obligatorio para exalumnos',
+          path: ['email'],
+        });
+      } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Ingresa un correo electrónico válido',
+          path: ['email'],
+        });
+      }
     }
-  }
-});
+  });
 
 //-------------------------------------------------------------------------------
 
@@ -171,7 +171,7 @@ export default function RegistrationForm() {
             </FormItem>
           )}
         />
-   {userType === 'alumni' && (
+        {userType === 'alumni' && (
           <>
             <FormField
               control={form.control}
@@ -225,7 +225,14 @@ export default function RegistrationForm() {
               <FormItem>
                 <FormLabel>Semestre que se cursa actualmente.</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" max="8" placeholder="1" {...field} />
+                  <Input
+                    type="number"
+                    min="1"
+                    max="8"
+                    placeholder="1"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -293,6 +300,6 @@ export default function RegistrationForm() {
       </form>
     </Form>
 
-    
+
   );
 }
