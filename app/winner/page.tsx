@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 
 interface Student {
     name: string;
@@ -97,10 +96,7 @@ export default function WinnerPage() {
 
         setTimeout(() => {
             if (students.length > 0) {
-                const randomArray = new Uint32Array(1);
-                window.crypto.getRandomValues(randomArray);
-                const randomIndex = randomArray[0] % students.length;
-
+                const randomIndex = Math.floor(Math.random() * students.length);
                 const winner = students[randomIndex];
 
                 setSelectedStudent(winner);
@@ -113,7 +109,6 @@ export default function WinnerPage() {
             setIsSelecting(false);
         }, 2000);
     };
-
 
     return (
         <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
@@ -143,6 +138,7 @@ export default function WinnerPage() {
                                 size="lg"
                                 onClick={selectRandomWinner}
                                 disabled={isSelecting || students.length === 0}
+                                className="w-full max-w-md bg-admin-black text-white hover:bg-opacity-90 py-8 text-xl"
                             >
                                 <Gift className="mr-2 h-6 w-6" />
                                 {isSelecting ? '¡Seleccionando al Ganador!' : '¡Seleccionar Ganador!'}
@@ -152,33 +148,20 @@ export default function WinnerPage() {
                         <AnimatePresence>
                             {selectedStudent && (
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                                    transition={{ duration: 0.7, type: "spring", bounce: 0.3 }}
-                                    className="w-full max-w-md mt-8 bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 rounded-2xl p-8 text-gray-900 shadow-[0_0_30px_rgba(251,191,36,0.3)] border border-amber-200/30 backdrop-blur-sm"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="w-full max-w-md mt-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-8 text-white shadow-xl"
                                 >
-                                    <div className="relative">
-                                        <div className="absolute -top-24 left-1/2 transform -translate-x-1/2">
-                                            <div className="w-20 h-20 bg-gradient-to-br from-yellow-300 to-amber-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-                                                <Gift className="w-10 h-10 text-white" />
-                                            </div>
-                                        </div>
-                                        <h3 className="text-3xl font-extrabold text-center mb-8 mt-8 text-gray-900">¡Felicidades al Ganador!</h3>
-                                        <div className="space-y-4 bg-white/80 rounded-xl p-6 backdrop-blur-sm border border-amber-100">
-                                            <p className="text-xl font-bold text-gray-900">{selectedStudent.name}</p>
-                                            <div className="grid grid-cols-2 gap-4 text-gray-700">
-                                                <p><span className="font-medium text-amber-700">Matrícula:</span><br />{selectedStudent.matricula}</p>
-                                                <p><span className="font-medium text-amber-700">Carrera:</span><br />{selectedStudent.career}</p>
-                                                <p><span className="font-medium text-amber-700">Campus:</span><br />{selectedStudent.campus}</p>
-                                                <p><span className="font-medium text-amber-700">Semestre:</span><br />{selectedStudent.semester}</p>
-                                            </div>
-                                            <p className="mt-4 text-center">
-                                                <span className="inline-block px-4 py-2 bg-amber-500 text-white rounded-full font-semibold">
-                                                    {selectedStudent.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}
-                                                </span>
-                                            </p>
-                                        </div>
+                                    <h3 className="text-2xl font-bold mb-6">¡Felicidades al Ganador!</h3>
+                                    <div className="space-y-4 text-left">
+                                        <p className="text-xl"><span className="font-semibold">Nombre:</span> {selectedStudent.name}</p>
+                                        <p><span className="font-semibold">Matrícula:</span> {selectedStudent.matricula}</p>
+                                        <p><span className="font-semibold">Carrera:</span> {selectedStudent.career}</p>
+                                        <p><span className="font-semibold">Campus:</span> {selectedStudent.campus}</p>
+                                        <p><span className="font-semibold">Semestre:</span> {selectedStudent.semester}</p>
+                                        <p><span className="font-semibold">Tipo:</span> {selectedStudent.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</p>
                                     </div>
                                 </motion.div>
                             )}
@@ -189,9 +172,6 @@ export default function WinnerPage() {
                 <div className="text-center mt-8">
                     <p className="text-white text-lg">
                         Total de Participantes: <span className="font-bold">{students.length}</span>
-                        <Link className='ml-4 underline' href="/admin">
-                            Volver
-                        </Link>
                     </p>
                 </div>
             </div>

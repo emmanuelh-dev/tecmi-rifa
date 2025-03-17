@@ -3,18 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Gift, Users, PieChart, Building2 } from 'lucide-react';
+import { Gift, Users, PieChart } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import EmpresaRegistrationForm from '@/components/EmpresaForm';
 
 // Define a type for student data
 interface Student {
@@ -45,24 +40,11 @@ export default function AdminPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Data for charts
   const [campusData, setCampusData] = useState<Array<{ name: string; value: number }>>([]);
   const [careerData, setCareerData] = useState<Array<{ name: string; value: number }>>([]);
   const [userTypeData, setUserTypeData] = useState<Array<{ name: string; value: number }>>([]);
-
-  const filteredEmpresas = empresas.filter(empresa =>
-    empresa.nombreEmpresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    empresa.nombreColaborador.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getCareerNames = (careerString: string) => {
-    const careerIds = careerString.split(',');
-    return careerIds.map(id =>
-      CAREERS.find(career => career.id === id)?.name || id
-    ).join(', ');
-  };
 
   // Load real student data from Supabase
   useEffect(() => {
@@ -222,19 +204,11 @@ export default function AdminPage() {
             <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
           </div>
           <div className="flex gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-white text-custom-green hover:bg-gray-100">
-                  Agregar Empresa
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Agregar Nueva Empresa</DialogTitle>
-                </DialogHeader>
-                <EmpresaRegistrationForm />
-              </DialogContent>
-            </Dialog>
+            <Link href="/empresa">
+              <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
+                Registro de Empresas
+              </Button>
+            </Link>
             <Link href="/winner">
               <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
                 Selección de Ganador
@@ -420,7 +394,7 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
+        <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
           <CardHeader>
             <CardTitle>Seleccionar Ganador</CardTitle>
           </CardHeader>
@@ -448,7 +422,7 @@ export default function AdminPage() {
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Lista de Participantes */}
         <Card className="bg-white border border-gray-200 shadow-lg">
