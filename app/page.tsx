@@ -2,6 +2,7 @@ import RegistrationForm from '@/components/RegistrationForm';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
+import AdminButton from '@/components/AdminButton';
 
 export default function Home() {
   return (
@@ -30,11 +31,7 @@ export default function Home() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/admin">
-              <Button variant="outline" className="bg-white text-custom-green hover:bg-black-100">
-                Panel de Administrador
-              </Button>
-            </Link>
+            <AdminButton />
           </div>
         </div>
       </div>

@@ -195,7 +195,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-admin-blue py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-green-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Encabezado con título y botón de Registro de Empresas */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
@@ -396,7 +396,7 @@ export default function AdminPage() {
               size="lg"
               onClick={selectRandomWinner}
               disabled={isSelecting || students.length === 0}
-              className="mb-6 bg-admin-blue text-white hover:bg-opacity-90"
+              className="mb-6 bg-admin-black text-white hover:bg-opacity-90"
             >
               {isSelecting ? 'Seleccionando...' : 'Seleccionar Ganador Aleatorio'}
             </Button>

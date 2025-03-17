@@ -2,7 +2,7 @@ import EmpresaForm from '@/components/EmpresaForm';
 
 export default function EmpresaPage() {
   return (
-    <div className="min-h-screen bg-admin-blue py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-green-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Registro de Empresas</h1>
