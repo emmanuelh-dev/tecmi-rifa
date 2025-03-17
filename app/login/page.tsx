@@ -2,10 +2,11 @@
 import React, { useState } from "react"
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card" 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
+import Image from "next/image";
 
 export default function LoginPage() {
     const router = useRouter()
@@ -13,7 +14,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
 
-    const handleLogin = async(e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
 
@@ -29,16 +30,25 @@ export default function LoginPage() {
             localStorage.removeItem('returnPath')
             router.push(returnPath)
 
-        } catch(error) {
+        } catch (error) {
             toast.error('Error al iniciar sesión')
         } finally {
             setIsLoading(false)
-        }  
+        }
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-green-700 to-green-400 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm">
+        <div className="max-h-screen h-screen flex items-center justify-center p-4 gap-10 bg-custom-green">
+            <div className="lg:w-1/2 hidden lg:block">
+                <Image
+                    src="/feria.jpg"
+                    alt="Empresas"
+                    width={400}
+                    height={400}
+                    className="w-full max-h-screen mx-auto object-contain"
+                />
+            </div>
+            <Card className="lg:w-1/2 w-full max-w-md bg-white/90 backdrop-blur-sm">
                 <CardHeader>
                     <CardTitle className="text-2xl text-center">Iniciar Sesión</CardTitle>
                 </CardHeader>

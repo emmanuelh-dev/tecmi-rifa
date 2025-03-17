@@ -3,13 +3,18 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gift, Users, PieChart } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Gift, Users, PieChart, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import EmpresaRegistrationForm from '@/components/EmpresaForm';
 
 // Define a type for student data
 interface Student {
@@ -40,11 +45,24 @@ export default function AdminPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Data for charts
-  const [campusData, setCampusData] = useState<Array<{name: string; value: number}>>([]);
-  const [careerData, setCareerData] = useState<Array<{name: string; value: number}>>([]);
-  const [userTypeData, setUserTypeData] = useState<Array<{name: string; value: number}>>([]);
+  const [campusData, setCampusData] = useState<Array<{ name: string; value: number }>>([]);
+  const [careerData, setCareerData] = useState<Array<{ name: string; value: number }>>([]);
+  const [userTypeData, setUserTypeData] = useState<Array<{ name: string; value: number }>>([]);
+
+  const filteredEmpresas = empresas.filter(empresa =>
+    empresa.nombreEmpresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    empresa.nombreColaborador.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getCareerNames = (careerString: string) => {
+    const careerIds = careerString.split(',');
+    return careerIds.map(id =>
+      CAREERS.find(career => career.id === id)?.name || id
+    ).join(', ');
+  };
 
   // Load real student data from Supabase
   useEffect(() => {
@@ -52,18 +70,18 @@ export default function AdminPage() {
       try {
         setIsLoading(true);
         const supabase = createClient();
-        
+
         const { data, error } = await supabase
           .from('RegistroTecmi')
           .select('*');
-        
+
         if (error) {
           throw error;
         }
-        
+
         if (data) {
           setStudents(data as Student[]);
-          
+
           // Process data for charts
           processChartData(data as Student[]);
         }
@@ -75,7 +93,7 @@ export default function AdminPage() {
         setIsLoading(false);
       }
     };
-    
+
     fetchStudents();
   }, []);
 
@@ -117,12 +135,12 @@ export default function AdminPage() {
     CAMPUSES.forEach(campus => {
       campusCounts[campus.name] = 0;
     });
-    
+
     data.forEach(student => {
       const campusName = CAMPUSES.find(c => c.id === student.campus)?.name || student.campus;
       campusCounts[campusName] = (campusCounts[campusName] || 0) + 1;
     });
-    
+
     const campusChartData = Object.entries(campusCounts)
       .filter(([_, count]) => count > 0) // Only include campuses with students
       .map(([name, value]) => ({ name, value }));
@@ -134,7 +152,7 @@ export default function AdminPage() {
       const careerName = CAREERS.find(c => c.id === student.career)?.name || student.career;
       careerCounts[careerName] = (careerCounts[careerName] || 0) + 1;
     });
-    
+
     const careerChartData = Object.entries(careerCounts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value) // Sort by count in descending order
@@ -146,7 +164,7 @@ export default function AdminPage() {
       'Estudiantes': 0,
       'ExaTecmis': 0
     };
-    
+
     data.forEach(student => {
       if (student.userType === 'student') {
         userTypeCounts['Estudiantes']++;
@@ -154,7 +172,7 @@ export default function AdminPage() {
         userTypeCounts['ExaTecmis']++;
       }
     });
-    
+
     const userTypeChartData = Object.entries(userTypeCounts)
       .map(([name, value]) => ({ name, value }));
     setUserTypeData(userTypeChartData);
@@ -162,20 +180,20 @@ export default function AdminPage() {
 
   const selectRandomWinner = () => {
     setIsSelecting(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       if (students.length > 0) {
         // Select a random student from the array
         const randomIndex = Math.floor(Math.random() * students.length);
         const winner = students[randomIndex];
-        
+
         setSelectedStudent(winner);
         toast.success('¡Ganador seleccionado!');
       } else {
         toast.error('No hay estudiantes disponibles');
       }
-      
+
       setIsSelecting(false);
     }, 2000);
   };
@@ -195,7 +213,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-green-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Encabezado con título y botón de Registro de Empresas */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
@@ -203,11 +221,26 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
             <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
           </div>
-          <Link href="/empresa">
-            <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
-              Registro de Empresas
-            </Button>
-          </Link>
+          <div className="flex gap-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-white text-custom-green hover:bg-gray-100">
+                  Agregar Empresa
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>Agregar Nueva Empresa</DialogTitle>
+                </DialogHeader>
+                <EmpresaRegistrationForm />
+              </DialogContent>
+            </Dialog>
+            <Link href="/winner">
+              <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
+                Selección de Ganador
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Charts Section */}
@@ -276,9 +309,9 @@ export default function AdminPage() {
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
-                    <YAxis 
-                      type="category" 
-                      dataKey="name" 
+                    <YAxis
+                      type="category"
+                      dataKey="name"
                       width={100}
                       tick={{ fontSize: 10 }}
                     />
@@ -387,7 +420,7 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
+        {/* <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
           <CardHeader>
             <CardTitle>Seleccionar Ganador</CardTitle>
           </CardHeader>
@@ -415,7 +448,7 @@ export default function AdminPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Lista de Participantes */}
         <Card className="bg-white border border-gray-200 shadow-lg">
