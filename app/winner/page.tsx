@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 interface Student {
     name: string;
@@ -138,7 +139,6 @@ export default function WinnerPage() {
                                 size="lg"
                                 onClick={selectRandomWinner}
                                 disabled={isSelecting || students.length === 0}
-                                className="w-full max-w-md bg-admin-black text-white hover:bg-opacity-90 py-8 text-xl"
                             >
                                 <Gift className="mr-2 h-6 w-6" />
                                 {isSelecting ? '¡Seleccionando al Ganador!' : '¡Seleccionar Ganador!'}
@@ -171,7 +171,7 @@ export default function WinnerPage() {
 
                 <div className="text-center mt-8">
                     <p className="text-white text-lg">
-                        Total de Participantes: <span className="font-bold">{students.length}</span>
+                        Total de Participantes: <span className="font-bold">{students.length}</span> <Link href="/admin" className='underline ml-2'>Volver</Link>
                     </p>
                 </div>
             </div>

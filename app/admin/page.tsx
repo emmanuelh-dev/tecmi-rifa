@@ -10,6 +10,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import EmpresaRegistrationForm from '@/components/EmpresaForm';
 
 // Define a type for student data
 interface Student {
@@ -204,11 +206,19 @@ export default function AdminPage() {
             <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
           </div>
           <div className="flex gap-4">
-            <Link href="/empresa">
-              <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
-                Registro de Empresas
-              </Button>
-            </Link>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-white text-custom-green hover:bg-gray-100">
+                  Registrar Empresa
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>Registrar Nueva Empresa</DialogTitle>
+                </DialogHeader>
+                <EmpresaRegistrationForm />
+              </DialogContent>
+            </Dialog>
             <Link href="/winner">
               <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
                 Selección de Ganador
@@ -393,36 +403,6 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="mb-8 bg-white border border-gray-200 shadow-lg">
-          <CardHeader>
-            <CardTitle>Seleccionar Ganador</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <Button
-              size="lg"
-              onClick={selectRandomWinner}
-              disabled={isSelecting || students.length === 0}
-              className="mb-6 bg-admin-black text-white hover:bg-opacity-90"
-            >
-              {isSelecting ? 'Seleccionando...' : 'Seleccionar Ganador Aleatorio'}
-            </Button>
-
-            {selectedStudent && (
-              <div className="w-full max-w-md bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">¡Ganador Seleccionado!</h3>
-                <div className="space-y-2">
-                  <p><strong>Nombre:</strong> {selectedStudent.name}</p>
-                  <p><strong>Matrícula:</strong> {selectedStudent.matricula}</p>
-                  <p><strong>Carrera:</strong> {selectedStudent.career}</p>
-                  <p><strong>Campus:</strong> {selectedStudent.campus}</p>
-                  <p><strong>Semestre:</strong> {selectedStudent.semester}</p>
-                  <p><strong>Tipo:</strong> {selectedStudent.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Lista de Participantes */}
         <Card className="bg-white border border-gray-200 shadow-lg">
