@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift } from 'lucide-react';
@@ -25,7 +25,7 @@ export default function WinnerPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     // Load students from Supabase
-    useState(() => {
+    useEffect(() => {
         const fetchStudents = async () => {
             try {
                 setIsLoading(true);
