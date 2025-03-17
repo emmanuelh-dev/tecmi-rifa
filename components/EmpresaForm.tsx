@@ -170,7 +170,7 @@ export default function EmpresaRegistrationForm() {
         {/* Botón de enviar */}
         <Button
           type="submit"
-          className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
+          className="w-full bg-black text-white hover:bg-black/90 focus:bg-black active:bg-black/80"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Registrando...' : 'Registrar empresa'}
