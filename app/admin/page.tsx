@@ -15,6 +15,7 @@ import EmpresaRegistrationForm from '@/components/EmpresaForm';
 
 // Define a type for student data
 interface Student {
+  id: string;
   name: string;
   matricula: string;
   career: string;
@@ -25,6 +26,7 @@ interface Student {
 
 // Define a type for empresa data
 interface Empresa {
+  id: string;
   created_at: string;
   nombreColaborador: string;
   nombreEmpresa: string;
@@ -35,6 +37,85 @@ interface Empresa {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
 
 export default function AdminPage() {
+  const [selectedStudentToEdit, setSelectedStudentToEdit] = useState<Student | null>(null);
+  const [selectedEmpresaToEdit, setSelectedEmpresaToEdit] = useState<Empresa | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ type: 'student' | 'empresa'; id: string } | null>(null);
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
+
+    const supabase = createClient();
+    const { type, id } = itemToDelete;
+
+    try {
+      const { error } = await supabase
+        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} eliminado con éxito`);
+      
+      // Refresh data
+      if (type === 'student') {
+        const { data } = await supabase.from('RegistroTecmi').select('*');
+        if (data) {
+          setStudents(data as Student[]);
+          processChartData(data as Student[]);
+        }
+      } else {
+        const { data } = await supabase.from('RegistroEmpresas').select('*');
+        if (data) setEmpresas(data as Empresa[]);
+      }
+    } catch (err) {
+      console.error('Error al eliminar:', err);
+      toast.error('Error al eliminar el registro');
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleEdit = async (type: 'student' | 'empresa', item: Student | Empresa) => {
+    if (type === 'student') {
+      setSelectedStudentToEdit(item as Student);
+    } else {
+      setSelectedEmpresaToEdit(item as Empresa);
+    }
+  };
+
+  const handleUpdate = async (type: 'student' | 'empresa', updatedData: any) => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase
+        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .update(updatedData)
+        .eq('id', updatedData.id);
+
+      if (error) throw error;
+
+      toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} actualizado con éxito`);
+      
+      // Refresh data
+      if (type === 'student') {
+        const { data } = await supabase.from('RegistroTecmi').select('*');
+        if (data) {
+          setStudents(data as Student[]);
+          processChartData(data as Student[]);
+        }
+        setSelectedStudentToEdit(null);
+      } else {
+        const { data } = await supabase.from('RegistroEmpresas').select('*');
+        if (data) setEmpresas(data as Empresa[]);
+        setSelectedEmpresaToEdit(null);
+      }
+    } catch (err) {
+      console.error('Error al actualizar:', err);
+      toast.error('Error al actualizar el registro');
+    }
+  };
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
@@ -426,9 +507,30 @@ export default function AdminPage() {
                     <tr key={student.matricula} className="border-b hover:bg-gray-50">
                       <td className="py-2 px-4">{student.name}</td>
                       <td className="py-2 px-4">{student.matricula}</td>
-                      <td className="py-2 px-4">{student.career}</td>
+                      <td className="py-2 px-4">{CAREERS.find(c => c.id === student.career)?.name || student.career}</td>
                       <td className="py-2 px-4">{student.campus}</td>
                       <td className="py-2 px-4">{student.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</td>
+                      <td className="py-2 px-4">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit('student', student)}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setItemToDelete({ type: 'student', id: student.id });
+                              setIsDeleteDialogOpen(true);
+                            }}
+                          >
+                            Eliminar
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -457,7 +559,28 @@ export default function AdminPage() {
                     <tr key={empresa.created_at} className="border-b hover:bg-gray-50">
                       <td className="py-2 px-4">{empresa.nombreColaborador}</td>
                       <td className="py-2 px-4">{empresa.nombreEmpresa}</td>
-                      <td className="py-2 px-4">{empresa.carreraBuscada}</td>
+                      <td className="py-2 px-4">{empresa.carreraBuscada.split(',').map(id => CAREERS.find(c => c.id === id)?.name || id).join(', ')}</td>
+                      <td className="py-2 px-4">
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit('empresa', empresa)}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setItemToDelete({ type: 'empresa', id: empresa.id });
+                              setIsDeleteDialogOpen(true);
+                            }}
+                          >
+                            Eliminar
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -466,6 +589,162 @@ export default function AdminPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminación</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p>¿Estás seguro que deseas eliminar este registro?</p>
+            <p className="text-sm text-gray-500 mt-2">Esta acción no se puede deshacer.</p>
+          </div>
+          <div className="flex justify-end gap-3 p-4">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Eliminar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={selectedStudentToEdit !== null} onOpenChange={() => setSelectedStudentToEdit(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Estudiante</DialogTitle>
+          </DialogHeader>
+          {selectedStudentToEdit && (
+            <div className="p-4 space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label>Nombre</label>
+                  <input
+                    className="border p-2 rounded"
+                    value={selectedStudentToEdit.name}
+                    onChange={(e) => setSelectedStudentToEdit({
+                      ...selectedStudentToEdit,
+                      name: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label>Matrícula</label>
+                  <input
+                    className="border p-2 rounded"
+                    value={selectedStudentToEdit.matricula}
+                    onChange={(e) => setSelectedStudentToEdit({
+                      ...selectedStudentToEdit,
+                      matricula: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label>Carrera</label>
+                  <select
+                    className="border p-2 rounded"
+                    value={selectedStudentToEdit.career}
+                    onChange={(e) => setSelectedStudentToEdit({
+                      ...selectedStudentToEdit,
+                      career: e.target.value
+                    })}
+                  >
+                    {CAREERS.map((career) => (
+                      <option key={career.id} value={career.id}>
+                        {career.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <label>Campus</label>
+                  <select
+                    className="border p-2 rounded"
+                    value={selectedStudentToEdit.campus}
+                    onChange={(e) => setSelectedStudentToEdit({
+                      ...selectedStudentToEdit,
+                      campus: e.target.value
+                    })}
+                  >
+                    {CAMPUSES.map((campus) => (
+                      <option key={campus.id} value={campus.id}>
+                        {campus.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setSelectedStudentToEdit(null)}>
+                  Cancelar
+                </Button>
+                <Button onClick={() => handleUpdate('student', selectedStudentToEdit)}>
+                  Guardar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Empresa Dialog */}
+      <Dialog open={selectedEmpresaToEdit !== null} onOpenChange={() => setSelectedEmpresaToEdit(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Empresa</DialogTitle>
+          </DialogHeader>
+          {selectedEmpresaToEdit && (
+            <div className="p-4 space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label>Nombre del Colaborador</label>
+                  <input
+                    className="border p-2 rounded"
+                    value={selectedEmpresaToEdit.nombreColaborador}
+                    onChange={(e) => setSelectedEmpresaToEdit({
+                      ...selectedEmpresaToEdit,
+                      nombreColaborador: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label>Nombre de la Empresa</label>
+                  <input
+                    className="border p-2 rounded"
+                    value={selectedEmpresaToEdit.nombreEmpresa}
+                    onChange={(e) => setSelectedEmpresaToEdit({
+                      ...selectedEmpresaToEdit,
+                      nombreEmpresa: e.target.value
+                    })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label>Carreras Buscadas</label>
+                  <input
+                    className="border p-2 rounded"
+                    value={selectedEmpresaToEdit.carreraBuscada}
+                    onChange={(e) => setSelectedEmpresaToEdit({
+                      ...selectedEmpresaToEdit,
+                      carreraBuscada: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setSelectedEmpresaToEdit(null)}>
+                  Cancelar
+                </Button>
+                <Button onClick={() => handleUpdate('empresa', selectedEmpresaToEdit)}>
+                  Guardar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
