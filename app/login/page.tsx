@@ -54,45 +54,47 @@ export default function LoginPage() {
                 <h1 className="text-3xl font-bold text-white mt-4 text-center">Feria de Empleo TECMI</h1>
                 <p className="text-lg text-gray-200 mt-2 text-center max-w-lg">Conectando talento con oportunidades</p>
             </div>
-            
+
             <div className="lg:w-1/2 w-full max-w-md p-2">
-                <Card className="w-full bg-white/95 backdrop-blur-sm shadow-xl border-0">
-                    <CardHeader className="space-y-2 pb-4">
-                        <CardTitle className="text-2xl font-bold text-center text-gray-800">Bienvenido</CardTitle>
-                        <p className="text-gray-600 text-center">Ingresa tus credenciales para continuar</p>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            <div className="space-y-2">
-                                <Input
-                                    type="email"
-                                    placeholder="Correo electrónico"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Input
-                                    type="password"
-                                    placeholder="Contraseña"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
-                                    required
-                                />
-                            </div>
-                            <Button
-                                type="submit"
-                                className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200 text-base font-medium"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+                <div className="flex flex-col items-center justify-center w-full">
+                    <Image
+                        src="/logo.png"
+                        alt="Feria de Empleo"
+                        width={200}
+                        height={200}
+                        className="w-full py-10"
+                        priority
+                    />
+                    <form onSubmit={handleLogin} className="space-y-4 w-full">
+                        <div className="space-y-2">
+                            <Input
+                                type="email"
+                                placeholder="Correo electrónico"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Input
+                                type="password"
+                                placeholder="Contraseña"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                                required
+                            />
+                        </div>
+                        <Button
+                            type="submit"
+                            className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200 text-base font-medium"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                        </Button>
+                    </form>
+                </div>
             </div>
         </div>
     )
