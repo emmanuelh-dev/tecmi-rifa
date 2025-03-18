@@ -87,7 +87,7 @@ export default function RegistrationForm() {
     defaultValues: {
       name: '',
       matricula: '',
-      userType: 'student',
+      userType: undefined,
       semester: 1,
       career: '',
       campus: '',
@@ -142,11 +142,11 @@ export default function RegistrationForm() {
           name="userType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Usuario</FormLabel>
+              <FormLabel>Tipo de Estudiante</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el tipo de usuario" />
+                    <SelectValue placeholder="¿Qué tipo de estudiante eres?" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -158,145 +158,152 @@ export default function RegistrationForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre Completo</FormLabel>
-              <FormControl>
-                <Input placeholder="Juan Diego Rodriguez Franco" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {userType === 'alumni' && (
-          <>
-            <FormField
-              control={form.control}
-              name="whatsapp"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>WhatsApp</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+52 1234567890" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Correo Electrónico Personal</FormLabel>
-                  <FormControl>
-                    <Input placeholder="correo@ejemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-
-        <FormField
-          control={form.control}
-          name="matricula"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Matrícula</FormLabel>
-              <FormControl>
-                <Input placeholder="AL02135046" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {userType === 'student' && (
-          <FormField
-            control={form.control}
-            name="semester"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Semestre que se cursa actualmente.</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="8"
-                    placeholder="1"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+        { userType !== undefined && (
+            <>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre Completo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Juan Diego Rodriguez Franco" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {userType === 'alumni' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+52 1234567890" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
-        <FormField
-          control={form.control}
-          name="career"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Carrera</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona tu carrera" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {CAREERS.map((career) => (
-                    <SelectItem key={career.id} value={career.id}>
-                      {career.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Correo Electrónico Personal</FormLabel>
+                        <FormControl>
+                          <Input placeholder="correo@ejemplo.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
-        <FormField
-          control={form.control}
-          name="campus"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Campus</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona tu campus al que perteneces" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {CAMPUSES.map((campus) => (
-                    <SelectItem key={campus.id} value={campus.id}>
-                      {campus.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              <FormField
+                control={form.control}
+                name="matricula"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Matrícula</FormLabel>
+                    <FormControl>
+                      <Input placeholder="AL02135046" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <Button
-          type="submit"
-          className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Registrando...' : 'Registrar'}
-        </Button>
+              {userType === 'student' && (
+                <FormField
+                  control={form.control}
+                  name="semester"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semestre que se cursa actualmente.</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="8"
+                          placeholder="1"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="career"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Carrera</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona tu carrera" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CAREERS.map((career) => (
+                          <SelectItem key={career.id} value={career.id}>
+                            {career.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="campus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Campus</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona tu campus al que perteneces" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CAMPUSES.map((campus) => (
+                          <SelectItem key={campus.id} value={campus.id}>
+                            {campus.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Registrando...' : 'Registrar'}
+              </Button>
+            </>
+          )
+        }
+
       </form>
     </Form>
 
