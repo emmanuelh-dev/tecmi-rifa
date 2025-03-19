@@ -5,7 +5,7 @@ export const CAREERS = [
   { id: 'IIN', name: 'Ingeniería Industrial' },
   { id: 'LEM', name: 'Licenciatura en Mercadotecnia' },
   {id : 'LCDE', name: 'Licenciatura en Creación y Desarrollo de Empresas'},
-  { id: 'LCEF', name: 'Licenciatura en Contabilidad y Estrategia Financiera' },
+  { id: 'LCI', name: 'Licenciatura en Comercio Internacional' },
   { id: 'LAE', name: 'Licenciatura Administración de Empresas' },
   { id: 'IDS', name: 'Ingeniería en Desarrollo de Software' },
   { id: 'LGI', name: 'Licenciatura en Gastronomía Internacional' },
