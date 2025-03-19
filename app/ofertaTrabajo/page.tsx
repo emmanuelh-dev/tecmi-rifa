@@ -1,11 +1,10 @@
-'use client';
-
+'use client'
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
-// Crear cliente de Supabase fuera del componente
+// Crear cliente de Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -19,15 +18,13 @@ export default function OfertaEmpleo() {
   const router = useRouter();
 
   useEffect(() => {
-    // Recuperar el tipo de carrera del alumno, esto puede venir de un estado global o desde un contexto
-    const storedCareer = localStorage.getItem('userCareer'); // Cambiar según cómo lo gestionas en tu app
+    const storedCareer = localStorage.getItem('userCareer');
     if (storedCareer) {
       setCareer(storedCareer);
       fetchEmpresas(storedCareer);
     }
   }, []);
 
-  // Función para obtener empresas
   const fetchEmpresas = async (career: string) => {
     try {
       const { data, error } = await supabase
@@ -55,7 +52,7 @@ export default function OfertaEmpleo() {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-2">Empresas que buscan {career}</h1>
             <p className="text-lg">
-              Aquí puedes encontrar empresas que están buscando tu perfil. ¡Acercate a los moduolos y pide informes!
+              Aquí puedes encontrar empresas que están buscando tu perfil. ¡Acércate a los módulos y pide informes!
             </p>
           </div>
 
@@ -64,13 +61,27 @@ export default function OfertaEmpleo() {
               <p>No hay empresas buscando tu carrera en este momento.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {empresas.map((empresa) => (
-                  <div key={empresa.id} className="border p-4 rounded-lg shadow-lg hover:shadow-xl">
-                    <h2 className="text-xl font-bold text-custom-green">{empresa.nombreEmpresa}</h2>
-                    <p className="mt-2">Colaborador: {empresa.nombreColaborador}</p>
-                    <p className="mt-2">Carreras buscadas: {empresa.carreraBuscada}</p>
-                  </div>
-                ))}
+                {empresas.map((empresa) => {
+                  // Obtener la URL del logo desde la columna 'logo'
+                  const logoUrl = empresa.logo;
+
+                  return (
+                    <div key={empresa.id} className="border p-4 rounded-lg shadow-lg hover:shadow-xl">
+                      <div className="flex justify-center">
+                        {/* Mostrar el logo usando la URL guardada */}
+                        <Image
+                          src={logoUrl}
+                          alt={`Logo de ${empresa.nombreEmpresa}`}
+                          width={100}
+                          height={100}
+                          className="rounded-md"
+                        />
+                      </div>
+                      <h2 className="text-xl font-bold text-custom-green mt-5">{empresa.nombreEmpresa}</h2>
+                      <p className="mt-2">Colaborador: {empresa.nombreColaborador}</p>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
