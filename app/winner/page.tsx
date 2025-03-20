@@ -23,6 +23,8 @@ export default function WinnerPage() {
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [isSelecting, setIsSelecting] = useState(false);
     const [students, setStudents] = useState<Student[]>([]);
+    const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
+    const [previousWinners, setPreviousWinners] = useState<Student[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Load students from Supabase
@@ -37,7 +39,11 @@ export default function WinnerPage() {
                     .select('*');
 
                 if (error) throw error;
-                if (data) setStudents(data as Student[]);
+                if (data) {
+                    const studentsData = data as Student[];
+                    setStudents(studentsData);
+                    setAvailableStudents(studentsData);
+                }
             } catch (err) {
                 console.error('Error fetching students:', err);
                 toast.error('Error al cargar los datos');
@@ -96,11 +102,19 @@ export default function WinnerPage() {
         setIsSelecting(true);
 
         setTimeout(() => {
-            if (students.length > 0) {
-                const randomIndex = Math.floor(Math.random() * students.length);
-                const winner = students[randomIndex];
+            if (availableStudents.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableStudents.length);
+                const winner = availableStudents[randomIndex];
 
+                // Actualizar el ganador seleccionado
                 setSelectedStudent(winner);
+                
+                // Agregar el ganador a la lista de ganadores previos
+                setPreviousWinners(prev => [...prev, winner]);
+                
+                // Filtrar el ganador de la lista de estudiantes disponibles
+                setAvailableStudents(prev => prev.filter(student => student.matricula !== winner.matricula));
+                
                 triggerConfetti();
                 toast.success('¡Ganador seleccionado!');
             } else {
@@ -138,7 +152,7 @@ export default function WinnerPage() {
                             <Button
                                 size="lg"
                                 onClick={selectRandomWinner}
-                                disabled={isSelecting || students.length === 0}
+                                disabled={isSelecting || availableStudents.length === 0}
                             >
                                 <Gift className="mr-2 h-6 w-6" />
                                 {isSelecting ? '¡Seleccionando al Ganador!' : '¡Seleccionar Ganador!'}
@@ -171,7 +185,10 @@ export default function WinnerPage() {
 
                 <div className="text-center mt-8">
                     <p className="text-white text-lg">
-                        Total de Participantes: <span className="font-bold">{students.length}</span> <Link href="/admin" className='underline ml-2'>Volver</Link>
+                        Total de Participantes: <span className="font-bold">{students.length}</span> | 
+                        Disponibles: <span className="font-bold">{availableStudents.length}</span> | 
+                        Ganadores Previos: <span className="font-bold">{previousWinners.length}</span> 
+                        <Link href="/admin" className='underline ml-2'>Volver</Link>
                     </p>
                 </div>
             </div>
