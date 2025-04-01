@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import AdminButton from '@/components/AdminButton';
 import EventTicket from '@/components/EventTicket';
+import TicketsCarousel from '@/components/TicketsCarousel';
 
 export default function Home() {
   return (
@@ -55,6 +56,11 @@ export default function Home() {
                 <EventTicket />
               </div>
             </div>
+          </div>
+          
+          {/* Tickets Carousel Section */}
+          <div className="mt-16">
+            <TicketsCarousel />
           </div>
           
           <div className="mt-12 text-center">
