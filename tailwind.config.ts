@@ -63,6 +63,9 @@ const config: Config = {
         // Aqui esta el color personalizado
         'custom-green': '#084F49', // verde tecmilenio (panel de registro) 
         'admin-blue': '#14095d', // azul oscuro (panel de administrador)
+        'tecmitalk-green': '#004d40', // verde oscuro TECMITALK
+        'tecmitalk-light': '#a5d6a7', // verde claro TECMITALK
+        'tecmitalk-accent': '#2EE22E', // verde brillante TECMITALK
       },
       keyframes: {
         'accordion-down': {

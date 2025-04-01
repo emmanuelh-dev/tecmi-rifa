@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120">
+  <style>
+    .text { font-family: Arial, sans-serif; font-weight: bold; }
+    .t-letter { fill: #2EE22E; }
+    .other-letters { fill: #2EE22E; }
+  </style>
+  <text x="10" y="90" class="text t-letter" font-size="90">T</text>
+  <text x="60" y="90" class="text other-letters" font-size="90">ECMI</text>
+  <text x="250" y="90" class="text other-letters" font-size="90">TALK</text>
+</svg>
