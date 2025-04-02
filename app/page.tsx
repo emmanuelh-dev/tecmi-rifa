@@ -1,4 +1,3 @@
-import RegistrationForm from '@/components/RegistrationForm';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,10 +43,6 @@ export default function Home() {
                 <div className="inline-block border border-white/30 rounded-full px-4 py-2 text-white">
                   Tecmilenio Campus San Nicolás
                 </div>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
-                <RegistrationForm />
               </div>
             </div>
             

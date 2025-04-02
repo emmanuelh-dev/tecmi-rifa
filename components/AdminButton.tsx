@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 
 export default function AdminButton() {
   const handleAdminClick = () => {
-    localStorage.setItem('returnPath', '/admin');
     window.location.href = '/login';
   };
 
