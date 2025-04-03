@@ -26,9 +26,7 @@ export default function LoginPage() {
             })
             if (error) throw error
             toast.success('Inicio de sesión exitoso')
-            const returnPath = localStorage.getItem('returnPath') || '/admin'
-            localStorage.removeItem('returnPath')
-            router.push(returnPath)
+            router.push('/admin')
 
         } catch (error) {
             toast.error('Error al iniciar sesión')
