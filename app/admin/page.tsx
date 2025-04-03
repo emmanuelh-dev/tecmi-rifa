@@ -1,73 +1,100 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Users, PieChart } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CAREERS, CAMPUSES } from '@/app/data/constants';
-import Link from 'next/link';
+import { CAREERS, CAMPUSES, BOLETOSTYPE, PAYTYPE } from '@/app/data/constants';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import EmpresaRegistrationForm from '@/components/EmpresaForm';
 
-// Define a type for student data
+
 interface Student {
   id: string;
   name: string;
   matricula: string;
+  semester: number;
   career: string;
   campus: string;
-  semester: number;
+  email: string;
+  whatsapp: string;
+  apellido: string;
+  typeticket: string;
+  typepay: string;
+  paid: boolean;
   userType: 'student' | 'alumni';
 }
 
-// Define a type for empresa data
-interface Empresa {
-  id: string;
-  created_at: string;
-  nombreColaborador: string;
-  nombreEmpresa: string;
-  carreraBuscada: string;
-}
 
-// Define colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
 
 export default function AdminPage() {
   const [selectedStudentToEdit, setSelectedStudentToEdit] = useState<Student | null>(null);
-  const [selectedEmpresaToEdit, setSelectedEmpresaToEdit] = useState<Empresa | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{ type: 'student' | 'empresa'; id: string } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string } | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    apellido: '',
+    matricula: '',
+    semester: 1,
+    career: '',
+    campus: '',
+    typeticket: '',
+    typepay: '',
+    paid: false
+  });
+
+  // Mover los estados de filtro dentro del componente
+  const [filters, setFilters] = useState({
+    ticketType: '',
+    paymentType: '',
+    paymentStatus: ''
+  });
+
+  // Mover la función de filtrado dentro del componente
+  const filteredStudents = students.filter(student => {
+    return (
+      (filters.ticketType === '' || student.typeticket === filters.ticketType) &&
+      (filters.paymentType === '' || student.typepay === filters.paymentType) &&
+      (filters.paymentStatus === '' || 
+        (filters.paymentStatus === 'paid' && student.paid) ||
+        (filters.paymentStatus === 'unpaid' && !student.paid))
+    );
+  });
+
+  // Resto del código del componente...
+
+  // Data for charts
+  const [campusData, setCampusData] = useState<Array<{ name: string; value: number }>>([]);
+  const [careerData, setCareerData] = useState<Array<{ name: string; value: number }>>([]);
+  const [userTypeData, setUserTypeData] = useState<Array<{ name: string; value: number }>>([]);
+  const [paymentData, setPaymentData] = useState<Array<{ name: string; value: number }>>([]);
+  const [ticketData, setTicketData] = useState<Array<{ name: string; value: number }>>([]);
 
   const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
 
     const supabase = createClient();
-    const { type, id } = itemToDelete;
 
     try {
       const { error } = await supabase
-        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .from('RegistroTecmi')
         .delete()
-        .eq('id', id);
+        .eq('id', itemToDelete.id);
 
       if (error) throw error;
 
-      toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} eliminado con éxito`);
+      toast.success('Asistente eliminado con éxito');
       
       // Refresh data
-      if (type === 'student') {
-        const { data } = await supabase.from('RegistroTecmi').select('*');
-        if (data) {
-          setStudents(data as Student[]);
-          processChartData(data as Student[]);
-        }
-      } else {
-        const { data } = await supabase.from('RegistroEmpresas').select('*');
-        if (data) setEmpresas(data as Empresa[]);
+      const { data } = await supabase.from('RegistroTecmi').select('*');
+      if (data) {
+        setStudents(data as Student[]);
+        processChartData(data as Student[]);
       }
     } catch (err) {
       console.error('Error al eliminar:', err);
@@ -78,122 +105,115 @@ export default function AdminPage() {
     }
   };
 
-  const handleEdit = async (type: 'student' | 'empresa', item: Student | Empresa) => {
-    if (type === 'student') {
-      setSelectedStudentToEdit(item as Student);
-    } else {
-      setSelectedEmpresaToEdit(item as Empresa);
-    }
+  const handleEdit = (student: Student) => {
+    setSelectedStudentToEdit(student);
   };
 
-  const handleUpdate = async (type: 'student' | 'empresa', updatedData: any) => {
+  const handleUpdate = async (updatedData: Student) => {
     const supabase = createClient();
     try {
       const { error } = await supabase
-        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .from('RegistroTecmi')
         .update(updatedData)
         .eq('id', updatedData.id);
 
       if (error) throw error;
 
-      toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} actualizado con éxito`);
+      toast.success('Asistente actualizado con éxito');
       
       // Refresh data
-      if (type === 'student') {
-        const { data } = await supabase.from('RegistroTecmi').select('*');
-        if (data) {
-          setStudents(data as Student[]);
-          processChartData(data as Student[]);
-        }
-        setSelectedStudentToEdit(null);
-      } else {
-        const { data } = await supabase.from('RegistroEmpresas').select('*');
-        if (data) setEmpresas(data as Empresa[]);
-        setSelectedEmpresaToEdit(null);
+      const { data } = await supabase.from('RegistroTecmi').select('*');
+      if (data) {
+        setStudents(data as Student[]);
+        processChartData(data as Student[]);
       }
+      setSelectedStudentToEdit(null);
     } catch (err) {
       console.error('Error al actualizar:', err);
       toast.error('Error al actualizar el registro');
     }
   };
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Data for charts
-  const [campusData, setCampusData] = useState<Array<{ name: string; value: number }>>([]);
-  const [careerData, setCareerData] = useState<Array<{ name: string; value: number }>>([]);
-  const [userTypeData, setUserTypeData] = useState<Array<{ name: string; value: number }>>([]);
-
-  // Load real student data from Supabase
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setIsLoading(true);
-        const supabase = createClient();
-
-        const { data, error } = await supabase
-          .from('RegistroTecmi')
-          .select('*');
-
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          setStudents(data as Student[]);
-
-          // Process data for charts
-          processChartData(data as Student[]);
-        }
-      } catch (err) {
-        console.error('Error fetching students:', err);
-        setError('Error al cargar los estudiantes. Por favor, intenta de nuevo.');
-        toast.error('Error al cargar los datos');
-      } finally {
-        setIsLoading(false);
+  const handleRegisterSubmit = async () => {
+    const supabase = createClient();
+    
+    try {
+      // Validación de campos obligatorios
+      if (!formData.name || !formData.matricula || !formData.typeticket) {
+        toast.error('Campos obligatorios faltantes', {
+          description: 'Nombre, matrícula y tipo de boleto son requeridos',
+          duration: 3000
+        });
+        return;
       }
-    };
-
-    fetchStudents();
-  }, []);
-
-  // Load empresas data from Supabase
-  useEffect(() => {
-    const fetchEmpresas = async () => {
-      try {
-        const supabase = createClient();
-        console.log('Iniciando consulta a Supabase...'); // Depuración
-
-        const { data, error } = await supabase
-          .from('RegistroEmpresas') // Nombre de la tabla en Supabase
-          .select('*');
-
-        if (error) {
-          console.error('Error en la consulta:', error); // Depuración
-          throw error;
-        }
-
-        if (data) {
-          console.log('Datos de empresas:', data); // Depuración
-          setEmpresas(data as Empresa[]);
-        } else {
-          console.log('No se encontraron datos en la tabla.'); // Depuración
-        }
-      } catch (err) {
-        console.error('Error fetching empresas:', err);
-        toast.error('Error al cargar las empresas');
+  
+      // Insertar en Supabase
+      const { error } = await supabase
+        .from('RegistroTecmi')
+        .insert([{
+          name: formData.name,
+          apellido: formData.apellido,
+          matricula: formData.matricula,
+          semester: formData.semester || 1, // Valor por defecto
+          career: formData.career,
+          campus: formData.campus,
+          typeticket: formData.typeticket,
+          typepay: formData.typepay,
+          paid: formData.paid || false, // Valor por defecto
+        }]);
+  
+      if (error) throw error;
+  
+      // Notificación de éxito mejorada
+      toast.success('¡Registro exitoso!', {
+        description: (
+          <div className="mt-2">
+            <p>{formData.name} {formData.apellido}</p>
+            <p className="text-sm opacity-80">Matrícula: {formData.matricula}</p>
+          </div>
+        ),
+        duration: 5000,
+        position: 'top-right'
+      });
+  
+      // Reset del formulario (versión optimizada)
+      setFormData({
+        name: '',
+        apellido: '',
+        matricula: '',
+        semester: 1,
+        career: '',
+        campus: '',
+        typeticket: '',
+        typepay: '',
+        paid: false
+      });
+  
+      // Refrescar datos (versión optimizada)
+      const { data, error: fetchError } = await supabase
+        .from('RegistroTecmi')
+        .select('*');
+        
+      if (fetchError) throw fetchError;
+      
+      if (data) {
+        setStudents(data as Student[]);
+        processChartData(data as Student[]);
       }
-    };
+  
+    } catch (err) {
+      console.error('Error al registrar:', err);
+      toast.error('Error en el registro', {
+        description: 'Ocurrió un error al procesar tu solicitud',
+        action: {
+          label: 'Reintentar',
+          onClick: () => handleRegisterSubmit(),
+        },
+      });
+    }
+  };
 
-    fetchEmpresas();
-  }, []);
 
-  // Process data for charts
   const processChartData = (data: Student[]) => {
     // Process campus data
     const campusCounts: Record<string, number> = {};
@@ -207,7 +227,7 @@ export default function AdminPage() {
     });
 
     const campusChartData = Object.entries(campusCounts)
-      .filter(([_, count]) => count > 0) // Only include campuses with students
+      .filter(([_, count]) => count > 0)
       .map(([name, value]) => ({ name, value }));
     setCampusData(campusChartData);
 
@@ -220,8 +240,8 @@ export default function AdminPage() {
 
     const careerChartData = Object.entries(careerCounts)
       .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value) // Sort by count in descending order
-      .slice(0, 5); // Only show top 5 careers
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
     setCareerData(careerChartData);
 
     // Process user type data
@@ -241,30 +261,66 @@ export default function AdminPage() {
     const userTypeChartData = Object.entries(userTypeCounts)
       .map(([name, value]) => ({ name, value }));
     setUserTypeData(userTypeChartData);
-  };
 
-  const selectRandomWinner = () => {
-    setIsSelecting(true);
+    // Process payment status data
+    const paymentCounts = {
+      'Pagado': 0,
+      'Pendiente': 0
+    };
 
-    // Simulate API call delay
-    setTimeout(() => {
-      if (students.length > 0) {
-        // Select a random student from the array
-        const randomIndex = Math.floor(Math.random() * students.length);
-        const winner = students[randomIndex];
-
-        setSelectedStudent(winner);
-        toast.success('¡Ganador seleccionado!');
+    data.forEach(student => {
+      if (student.paid) {
+        paymentCounts['Pagado']++;
       } else {
-        toast.error('No hay estudiantes disponibles');
+        paymentCounts['Pendiente']++;
       }
+    });
 
-      setIsSelecting(false);
-    }, 2000);
+    const paymentChartData = Object.entries(paymentCounts)
+      .map(([name, value]) => ({ name, value }));
+    setPaymentData(paymentChartData);
+
+    // Process ticket type data
+    const ticketCounts: Record<string, number> = {};
+    data.forEach(student => {
+      const ticketType = BOLETOSTYPE.find(b => b.id === student.typeticket)?.name || 'No especificado';
+      ticketCounts[ticketType] = (ticketCounts[ticketType] || 0) + 1;
+    });
+
+    const ticketChartData = Object.entries(ticketCounts)
+      .map(([name, value]) => ({ name, value }));
+    setTicketData(ticketChartData);
   };
 
-  // Custom label for pie chart
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setIsLoading(true);
+        const supabase = createClient();
+
+        const { data, error } = await supabase
+          .from('RegistroTecmi')
+          .select('*');
+
+        if (error) throw error;
+
+        if (data) {
+          setStudents(data as Student[]);
+          processChartData(data as Student[]);
+        }
+      } catch (err) {
+        console.error('Error fetching students:', err);
+        setError('Error al cargar los asistentes. Por favor, intenta de nuevo.');
+        toast.error('Error al cargar los datos');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -280,36 +336,259 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Encabezado con título y botón de Registro de Empresas */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="mb-4 md:mb-0">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Panel de Administrador</h1>
-            <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
+            <p className="text-lg text-gray-300">Gestión de Asistentes</p>
           </div>
           <div className="flex gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-white text-custom-green hover:bg-gray-100">
-                  Registrar Empresa
+          <Dialog>
+          <DialogTrigger asChild>
+            <Button className="bg-white text-custom-green hover:bg-gray-100">
+              Registrar Asistente
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Registrar Nuevo Asistente</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Sección 1: Datos Personales */}
+              <div className="border-b pb-4">
+                <h3 className="text-lg font-medium">Datos Personales</h3>
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  <div className="grid gap-2">
+                    <label>Nombre(s)</label>
+                    <input 
+                      className="border p-2 rounded"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      placeholder="Ej. Juan Carlos"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Apellidos</label>
+                    <input 
+                      className="border p-2 rounded"
+                      value={formData.apellido}
+                      onChange={(e) => setFormData({...formData, apellido: e.target.value})}
+                      placeholder="Ej. Pérez López"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Matrícula</label>
+                    <input 
+                      className="border p-2 rounded"
+                      value={formData.matricula}
+                      onChange={(e) => setFormData({...formData, matricula: e.target.value})}
+                      placeholder="Ej. A01234567"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+  <label>Semestre</label>
+  <input 
+    type="number" 
+    min="1" 
+    max="8"
+    className="border p-2 rounded"
+    value={formData.semester || ''}
+    onChange={(e) => {
+      const value = e.target.value;
+      // Permitir campo vacío temporalmente
+      if (value === '') {
+        setFormData({...formData, semester: 0}); // Set to default value 1 instead of empty string
+      } else {
+        const numValue = parseInt(value);
+        if (!isNaN(numValue)) {
+          // Asegurarse que esté entre 1 y 8
+          const clampedValue = Math.min(8, Math.max(1, numValue));
+          setFormData({...formData, semester: clampedValue});
+        }
+      }
+    }}
+    onBlur={(e) => {
+      // Si queda vacío al salir, poner valor por defecto 1
+      if (e.target.value === '') {
+        setFormData({...formData, semester: 1});
+      }
+    }}
+    placeholder="Ej. 5"
+  />
+</div>
+                  <div className="flex flex-wrap gap-4">
+  <div className="flex-1 min-w-[200px]">
+    <label className="block mb-2 text-sm font-medium text-gray-700">  {/* Estilos añadidos */}
+      Carrera
+    </label>
+    <select 
+      className="border p-2 rounded h-[42px] w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      value={formData.career}
+      onChange={(e) => setFormData({...formData, career: e.target.value})}
+    >
+      <option value="">Selecciona tu carrera</option>
+      {CAREERS.map((career) => (
+        <option key={career.id} value={career.id}>
+          {career.name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+                  <div className="grid gap-2">
+                    <label>Campus</label>
+                    <select 
+                      className="border p-2 rounded h-[42px]"
+                      value={formData.campus}
+                      onChange={(e) => setFormData({...formData, campus: e.target.value})}
+                    >
+                      <option value="">Selecciona tu campus</option>
+                      {CAMPUSES.map((campus) => (
+                        <option key={campus.id} value={campus.id}>
+                          {campus.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Sección 2: Información del Boleto */}
+              <div>
+                <h3 className="text-lg font-medium">Información del Boleto</h3>
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  <div className="grid gap-2">
+                    <label>Tipo de Boleto</label>
+                    <select
+                      className="border p-2 rounded h-[42px]"
+                      value={formData.typeticket}
+                      onChange={(e) => setFormData({...formData, typeticket: e.target.value})}
+                    >
+                      <option value="">Selecciona un tipo</option>
+                      {BOLETOSTYPE.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Tipo de Pago</label>
+                    <select
+                      className="border p-2 rounded h-[42px]"
+                      value={formData.typepay}
+                      onChange={(e) => setFormData({...formData, typepay: e.target.value})}
+                    >
+                      <option value="">Selecciona método</option>
+                      {PAYTYPE.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Estado de Pago</label>
+                    <select
+                      className="border p-2 rounded h-[42px]"
+                      value={formData.paid ? 'true' : 'false'}
+                      onChange={(e) => setFormData({...formData, paid: e.target.value === 'true'})}
+                    >
+                      <option value="true">Pagado</option>
+                      <option value="false">Pendiente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón de envío */}
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleRegisterSubmit}
+                  disabled={!formData.name || !formData.matricula || !formData.typeticket}
+                  className="bg-custom-green text-white hover:bg-green-600"
+                >
+                  Registrar Asistente
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Registrar Nueva Empresa</DialogTitle>
-                </DialogHeader>
-                <EmpresaRegistrationForm />
-              </DialogContent>
-            </Dialog>
-            <Link href="/winner">
-              <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
-                Selección de Ganador
-              </Button>
-            </Link>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
           </div>
         </div>
 
-        {/* Charts Section */}
         <div className="grid gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3">
+          {/* Payment Status Chart */}
+          <Card className="bg-white border border-gray-200 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Estado de Pagos</CardTitle>
+              <PieChart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="h-64">
+              {!isLoading && paymentData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ReChartPie>
+                    <Pie
+                      data={paymentData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {paymentData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </ReChartPie>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  {isLoading ? 'Cargando datos...' : 'No hay datos disponibles'}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Ticket Distribution Chart */}
+          <Card className="bg-white border border-gray-200 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Distribución de Boletos</CardTitle>
+              <PieChart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="h-64">
+              {!isLoading && ticketData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ReChartPie>
+                    <Pie
+                      data={ticketData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {ticketData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </ReChartPie>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  {isLoading ? 'Cargando datos...' : 'No hay datos disponibles'}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Campus Distribution Chart */}
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -330,105 +609,11 @@ export default function AdminPage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {campusData.map((entry, index) => (
+                      {campusData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="bg-white p-2 border border-gray-200 rounded shadow-md">
-                              <p className="font-medium">{payload[0].name}</p>
-                              <p>{`${payload[0].value} participantes`}</p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Legend />
-                  </ReChartPie>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  {isLoading ? 'Cargando datos...' : 'No hay datos disponibles'}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Career Distribution Chart */}
-          <Card className="bg-white border border-gray-200 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Top 5 Carreras</CardTitle>
-              <PieChart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="h-64">
-              {!isLoading && careerData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={careerData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      width={100}
-                      tick={{ fontSize: 10 }}
-                    />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#8884d8" name="Participantes" />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  {isLoading ? 'Cargando datos...' : 'No hay datos disponibles'}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* User Type Distribution Chart */}
-          <Card className="bg-white border border-gray-200 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tipo de Usuario</CardTitle>
-              <PieChart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="h-64">
-              {!isLoading && userTypeData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReChartPie>
-                    <Pie
-                      data={userTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {userTypeData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="bg-white p-2 border border-gray-200 rounded shadow-md">
-                              <p className="font-medium">{payload[0].name}</p>
-                              <p>{`${payload[0].value} participantes`}</p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
                     <Legend />
                   </ReChartPie>
                 </ResponsiveContainer>
@@ -441,36 +626,18 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        <div className="grid gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3">
-          {/* Total de Participantes */}
+        <div className="grid gap-6 mb-8 md:grid-cols-2">
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Participantes</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Asistentes</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{students.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Estudiantes registrados
-              </p>
+              <p className="text-xs text-muted-foreground">Asistentes registrados</p>
             </CardContent>
           </Card>
 
-          {/* Total de Empresas */}
-          <Card className="bg-white border border-gray-200 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Empresas</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{empresas.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Empresas registradas
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Estado */}
           <Card className="bg-white border border-gray-200 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Estado</CardTitle>
@@ -485,109 +652,132 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* Lista de Participantes */}
+        {/* Asistentes Table */}
         <Card className="bg-white border border-gray-200 shadow-lg">
-          <CardHeader>
-            <CardTitle>Lista de Participantes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4">Nombre</th>
-                    <th className="text-left py-3 px-4">Matrícula</th>
-                    <th className="text-left py-3 px-4">Carrera</th>
-                    <th className="text-left py-3 px-4">Campus</th>
-                    <th className="text-left py-3 px-4">Tipo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((student) => (
-                    <tr key={student.matricula} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-4">{student.name}</td>
-                      <td className="py-2 px-4">{student.matricula}</td>
-                      <td className="py-2 px-4">{CAREERS.find(c => c.id === student.career)?.name || student.career}</td>
-                      <td className="py-2 px-4">{student.campus}</td>
-                      <td className="py-2 px-4">{student.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</td>
-                      <td className="py-2 px-4">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit('student', student)}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setItemToDelete({ type: 'student', id: student.id });
-                              setIsDeleteDialogOpen(true);
-                            }}
-                          >
-                            Eliminar
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+  <CardHeader>
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <CardTitle>Lista de Asistentes</CardTitle>
+      <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+        {/* Filtro por Tipo de Boleto */}
+        <select
+          className="border p-2 rounded text-sm"
+          value={filters.ticketType}
+          onChange={(e) => setFilters({...filters, ticketType: e.target.value})}
+        >
+          <option value="">Todos los boletos</option>
+          {BOLETOSTYPE.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name}
+            </option>
+          ))}
+        </select>
 
-        {/* Empresas Registradas */}
-        <Card className="bg-white border border-gray-200 shadow-lg mt-6">
-          <CardHeader>
-            <CardTitle>Lista De Empresas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4">Nombre Colaborador</th>
-                    <th className="text-left py-3 px-4">Nombre Empresa</th>
-                    <th className="text-left py-3 px-4">Carrera Buscada</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {empresas.map((empresa) => (
-                    <tr key={empresa.created_at} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-4">{empresa.nombreColaborador}</td>
-                      <td className="py-2 px-4">{empresa.nombreEmpresa}</td>
-                      <td className="py-2 px-4">{empresa.carreraBuscada.split(',').map(id => CAREERS.find(c => c.id === id)?.name || id).join(', ')}</td>
-                      <td className="py-2 px-4">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit('empresa', empresa)}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setItemToDelete({ type: 'empresa', id: empresa.id });
-                              setIsDeleteDialogOpen(true);
-                            }}
-                          >
-                            Eliminar
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Filtro por Tipo de Pago */}
+        <select
+          className="border p-2 rounded text-sm"
+          value={filters.paymentType}
+          onChange={(e) => setFilters({...filters, paymentType: e.target.value})}
+        >
+          <option value="">Todos los pagos</option>
+          {PAYTYPE.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Filtro por Estado de Pago */}
+        <select
+          className="border p-2 rounded text-sm"
+          value={filters.paymentStatus}
+          onChange={(e) => setFilters({...filters, paymentStatus: e.target.value})}
+        >
+          <option value="">Todos los estados</option>
+          <option value="paid">Pagado</option>
+          <option value="unpaid">Pendiente</option>
+        </select>
+
+        {/* Botón para limpiar filtros */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setFilters({
+            ticketType: '',
+            paymentType: '',
+            paymentStatus: ''
+          })}
+          className="whitespace-nowrap"
+        >
+          Limpiar filtros
+        </Button>
+      </div>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left py-3 px-4">Nombre</th>
+            <th className="text-left py-3 px-4">Matrícula</th>
+            <th className="text-left py-3 px-4">Carrera</th>
+            <th className="text-left py-3 px-4">Campus</th>
+            <th className="text-left py-3 px-4">Tipo de Boleto</th>
+            <th className="text-left py-3 px-4">Tipo de Pago</th>
+            <th className="text-left py-3 px-4">Estado de Pago</th>
+            <th className="text-left py-3 px-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredStudents.length > 0 ? (
+            filteredStudents.map((student) => (
+              <tr key={student.id} className="border-b hover:bg-gray-50">
+                <td className="py-2 px-4">{student.name} {student.apellido}</td>
+                <td className="py-2 px-4">{student.matricula}</td>
+                <td className="py-2 px-4">{CAREERS.find(c => c.id === student.career)?.name || student.career}</td>
+                <td className="py-2 px-4">{CAMPUSES.find(c => c.id === student.campus)?.name || student.campus}</td>
+                <td className="py-2 px-4">{BOLETOSTYPE.find(t => t.id === student.typeticket)?.name || student.typeticket}</td>
+                <td className="py-2 px-4">{PAYTYPE.find(t => t.id === student.typepay)?.name || student.typepay}</td>
+                <td className="py-2 px-4">
+                  <span className={`px-2 py-1 rounded-full text-xs ${student.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    {student.paid ? 'Pagado' : 'Pendiente'}
+                  </span>
+                </td>
+                <td className="py-2 px-4">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(student)}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setItemToDelete({ id: student.id });
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={8} className="py-4 text-center text-gray-500">
+                No se encontraron asistentes con los filtros aplicados
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </CardContent>
+</Card>
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -597,7 +787,7 @@ export default function AdminPage() {
             <DialogTitle>Confirmar Eliminación</DialogTitle>
           </DialogHeader>
           <div className="p-4">
-            <p>¿Estás seguro que deseas eliminar este registro?</p>
+            <p>¿Estás seguro que deseas eliminar este asistente?</p>
             <p className="text-sm text-gray-500 mt-2">Esta acción no se puede deshacer.</p>
           </div>
           <div className="flex justify-end gap-3 p-4">
@@ -613,131 +803,124 @@ export default function AdminPage() {
 
       {/* Edit Student Dialog */}
       <Dialog open={selectedStudentToEdit !== null} onOpenChange={() => setSelectedStudentToEdit(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Editar Estudiante</DialogTitle>
+            <DialogTitle>Editar Asistente</DialogTitle>
           </DialogHeader>
           {selectedStudentToEdit && (
-            <div className="p-4 space-y-4">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <label>Nombre</label>
-                  <input
-                    className="border p-2 rounded"
-                    value={selectedStudentToEdit.name}
-                    onChange={(e) => setSelectedStudentToEdit({
-                      ...selectedStudentToEdit,
-                      name: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label>Matrícula</label>
-                  <input
-                    className="border p-2 rounded"
-                    value={selectedStudentToEdit.matricula}
-                    onChange={(e) => setSelectedStudentToEdit({
-                      ...selectedStudentToEdit,
-                      matricula: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label>Carrera</label>
-                  <select
-                    className="border p-2 rounded"
-                    value={selectedStudentToEdit.career}
-                    onChange={(e) => setSelectedStudentToEdit({
-                      ...selectedStudentToEdit,
-                      career: e.target.value
-                    })}
-                  >
-                    {CAREERS.map((career) => (
-                      <option key={career.id} value={career.id}>
-                        {career.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid gap-2">
-                  <label>Campus</label>
-                  <select
-                    className="border p-2 rounded"
-                    value={selectedStudentToEdit.campus}
-                    onChange={(e) => setSelectedStudentToEdit({
-                      ...selectedStudentToEdit,
-                      campus: e.target.value
-                    })}
-                  >
-                    {CAMPUSES.map((campus) => (
-                      <option key={campus.id} value={campus.id}>
-                        {campus.name}
-                      </option>
-                    ))}
-                  </select>
+            <div className="p-4 space-y-6">
+              {/* Sección 1: Datos Personales */}
+              <div className="border-b pb-4">
+                <h3 className="text-lg font-medium">Datos Personales</h3>
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  <div className="grid gap-2">
+                    <label>Nombre</label>
+                    <input
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.name}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        name: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Apellidos</label>
+                    <input
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.apellido}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        apellido: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Matrícula</label>
+                    <input
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.matricula}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        matricula: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Semestre</label>
+                    <input
+                      type="number"
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.semester}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        semester: parseInt(e.target.value) || 0
+                      })}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-end gap-3">
+              
+              {/* Sección 2: Información del Boleto */}
+              <div>
+                <h3 className="text-lg font-medium">Información del Boleto</h3>
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  <div className="grid gap-2">
+                    <label>Tipo de Boleto</label>
+                    <select
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.typeticket}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        typeticket: e.target.value
+                      })}
+                    >
+                      {BOLETOSTYPE.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Tipo de Pago</label>
+                    <select
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.typepay}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        typepay: e.target.value
+                      })}
+                    >
+                      {PAYTYPE.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label>Estado de Pago</label>
+                    <select
+                      className="border p-2 rounded"
+                      value={selectedStudentToEdit.paid ? 'true' : 'false'}
+                      onChange={(e) => setSelectedStudentToEdit({
+                        ...selectedStudentToEdit,
+                        paid: e.target.value === 'true'
+                      })}
+                    >
+                      <option value="true">Pagado</option>
+                      <option value="false">Pendiente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3 pt-4">
                 <Button variant="outline" onClick={() => setSelectedStudentToEdit(null)}>
                   Cancelar
                 </Button>
-                <Button onClick={() => handleUpdate('student', selectedStudentToEdit)}>
-                  Guardar
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Empresa Dialog */}
-      <Dialog open={selectedEmpresaToEdit !== null} onOpenChange={() => setSelectedEmpresaToEdit(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Empresa</DialogTitle>
-          </DialogHeader>
-          {selectedEmpresaToEdit && (
-            <div className="p-4 space-y-4">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <label>Nombre del Colaborador</label>
-                  <input
-                    className="border p-2 rounded"
-                    value={selectedEmpresaToEdit.nombreColaborador}
-                    onChange={(e) => setSelectedEmpresaToEdit({
-                      ...selectedEmpresaToEdit,
-                      nombreColaborador: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label>Nombre de la Empresa</label>
-                  <input
-                    className="border p-2 rounded"
-                    value={selectedEmpresaToEdit.nombreEmpresa}
-                    onChange={(e) => setSelectedEmpresaToEdit({
-                      ...selectedEmpresaToEdit,
-                      nombreEmpresa: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label>Carreras Buscadas</label>
-                  <input
-                    className="border p-2 rounded"
-                    value={selectedEmpresaToEdit.carreraBuscada}
-                    onChange={(e) => setSelectedEmpresaToEdit({
-                      ...selectedEmpresaToEdit,
-                      carreraBuscada: e.target.value
-                    })}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setSelectedEmpresaToEdit(null)}>
-                  Cancelar
-                </Button>
-                <Button onClick={() => handleUpdate('empresa', selectedEmpresaToEdit)}>
+                <Button onClick={() => handleUpdate(selectedStudentToEdit)}>
                   Guardar
                 </Button>
               </div>
