@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { CAREERS } from '@/app/data/constants';
+import { CAREERS, CAMPUSES,BOLETOSTYPE, PAYTYPE } from '@/app/data/constants';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -24,28 +24,49 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
-// Crear cliente de Supabase fuera del componente
+// Crear cliente de Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+//AQUI ERA EL ERRO DE LAS VALIDACIO----------------------------------------------------------------------------------------------------
 const formSchema = z.object({
-  nombreColaborador: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-  nombreEmpresa: z.string().min(2, 'El nombre de la empresa debe tener al menos 2 caracteres'),
-  carrerasBuscadas: z.array(z.string()).min(1, 'Selecciona al menos una carrera'),
-});
+  name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+  apellido: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
+  matricula: z.string().min(10, 'La matrícula debe tener al menos 10 caracteres'),
+  semester: z.number()
+    .min(1, 'El semestre debe estar entre 1 y 8')
+    .max(8, 'El semestre debe estar entre 1 y 8'),
+  career: z.string().min(1, 'Selecciona una carrera'),
+  campus: z.string().min(1, 'Selecciona un campus'),
+  whatsapp: z.string().optional(), // WhatsApp es opcional por defecto
+  email: z.string().optional(),
+  tipoboleto: z.string().min(1, 'Selecciona un tipo de boleto'),
+  tipopago: z.string().min(1, 'Selecciona un método de pago'),
+}); // Email es opcional por defecto
 
-export default function EmpresaRegistrationForm() {
+//-------------------------------------------------------------------------------
+
+
+export default function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nombreColaborador: '',
-      nombreEmpresa: '',
-      carrerasBuscadas: [],
+      name: '',
+      apellido: '',
+      matricula: '',
+      semester: 1,
+      career: '',
+      campus: '',
+      whatsapp: '',
+      email: '',
+      tipoboleto: '',
+      tipopago: '',
     },
   });
 
@@ -53,19 +74,21 @@ export default function EmpresaRegistrationForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      console.log("Datos a enviar:", values); // Verifica los datos
-
-      // Convertir el array de carreras a un string separado por comas
-      const carrerasTexto = values.carrerasBuscadas.join(',');
-
+      // Inserta los datos en Supabase
       const { error } = await supabase
-        .from('RegistroEmpresas')
+        .from('RegistroTecmi')
         .insert([
           {
-            nombreColaborador: values.nombreColaborador,
-            nombreEmpresa: values.nombreEmpresa,
-            carreraBuscada: carrerasTexto, // Usar carreraBuscada (singular)
-            tipoUsuario: 'empresa', // Incluir tipoUsuario (ajusta el valor según sea necesario)
+            name: values.name,
+            apellido: values.apellido,
+            matricula: values.matricula,
+            semester: values.semester,
+            career: values.career,
+            campus: values.campus,
+            tipoboleto: values.tipoboleto,
+            tipopago: values.tipopago,
+            whatsapp: values.whatsapp || null, // Si está vacío, se guarda como NULL
+            email: values.email || null, // Si está vacío, se guarda como NULL
           },
         ]);
 
@@ -73,67 +96,125 @@ export default function EmpresaRegistrationForm() {
         throw error;
       }
 
-      toast.success('¡Registro exitoso! La empresa ha sido registrada.');
-      form.reset(); // Limpiar el formulario
+      localStorage.setItem('userCareer', values.career);
+      router.push('/ofertaTrabajo'); // Redirige al usuario a la página de ofertas de empleo
+
+      toast.success('¡Registro exitoso! Estás participando en la rifa');
+      form.reset();
     } catch (error) {
-      console.error("Error al registrar:", error); // Muestra el error en la consola
       toast.error('Error al registrar. Por favor intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  // Función para eliminar una carrera del array
-  const handleRemoveCareer = (careerId: string, field: any) => {
-    const nuevasCarreras = field.value.filter((id: string) => id !== careerId);
-    field.onChange(nuevasCarreras);
-  };
+  const userType = localStorage.getItem('userType');
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Campo name (corregido de 'nombre' a 'name') */}
         <FormField
           control={form.control}
-          name="nombreColaborador"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del colaborador</FormLabel>
+              <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input placeholder="Juan Pérez" {...field} />
+                <Input placeholder="Juan Diego" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="nombreEmpresa"
+          name="apellido"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre de la empresa</FormLabel>
+              <FormLabel>Apellidos</FormLabel>
               <FormControl>
-                <Input placeholder="Mi Empresa S.A. de C.V." {...field} />
+                <Input placeholder="Rodriguez Franco" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="carrerasBuscadas"
+          name="whatsapp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Carreras buscadas</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  // Agregar la carrera seleccionada al array
-                  const nuevasCarreras = [...field.value, value];
-                  field.onChange(nuevasCarreras);
-                }}
-              >
+              <FormLabel>WhatsApp</FormLabel>
+              <FormControl>
+                <Input placeholder="+52 1234567890" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Correo Electrónico Personal</FormLabel>
+              <FormControl>
+                <Input placeholder="correo@ejemplo.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="matricula"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Matrícula</FormLabel>
+              <FormControl>
+                <Input placeholder="AL02135046" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="semester"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Semestre que se cursa actualmente</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="1"
+                  max="8"
+                  placeholder="1"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="career"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Carrera</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona las carreras que buscas" />
+                    <SelectValue placeholder="Selecciona tu carrera" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -145,35 +226,91 @@ export default function EmpresaRegistrationForm() {
                 </SelectContent>
               </Select>
               <FormMessage />
-              {/* Mostrar las carreras seleccionadas */}
-              <div className="mt-2">
-                {field.value.map((carreraId) => {
-                  const carrera = CAREERS.find((c) => c.id === carreraId);
-                  return (
-                    <div key={carreraId} className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
-                      <span>{carrera?.name}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleRemoveCareer(carreraId, field)}
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
             </FormItem>
           )}
         />
 
-        {/* Botón de enviar */}
+        <FormField
+          control={form.control}
+          name="campus"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Campus</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona tu campus" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {CAMPUSES.map((campus) => (
+                    <SelectItem key={campus.id} value={campus.id}>
+                      {campus.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tipoboleto"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo de Boleto</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el tipo de boleto" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {BOLETOSTYPE.map((boleto) => (
+                    <SelectItem key={boleto.id} value={boleto.id}>
+                      {boleto.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tipopago"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Método de Pago</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el método de pago" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {PAYTYPE.map((pago) => (
+                    <SelectItem key={pago.id} value={pago.id}>
+                      {pago.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button
           type="submit"
-          className="w-full bg-black text-white hover:bg-black/90 focus:bg-black active:bg-black/80"
+          className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Registrando...' : 'Registrar empresa'}
+          {isSubmitting ? 'Registrando...' : 'Registrar'}
         </Button>
       </form>
     </Form>
