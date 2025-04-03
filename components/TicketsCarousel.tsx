@@ -15,7 +15,6 @@ import PriorityTicket from './PriorityTicket';
 export default function TicketsCarousel() {
   return (
     <div className="w-full py-8">
-      <h2 className="text-2xl font-bold text-white text-center mb-6">Nuestros Boletos</h2>
       <p className="text-white text-center mb-8">Desliza para ver los beneficios de cada tipo de boleto</p>
       
       <Carousel
