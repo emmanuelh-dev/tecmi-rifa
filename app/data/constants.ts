@@ -20,14 +20,3 @@ export const CAMPUSES = [
   { id: 'San Nicolás', name: 'Campus San Nicolás' },
   { id: 'Las Torres', name: 'Campus Las Torres' },
 ];
-
-export const BOLETOSTYPE = [
-  { id: 'general', name: 'Boleto General' },
-  { id: 'vip', name: 'Boleto VIP' },
-  { id: 'priority', name: 'Boleto Priority' },
-]
-
-export const PAYTYPE = [
-  { id: 'efectivo', name: 'Efectivo' },
-  { id: 'transferencia', name: 'Transferencia' },
-]
