@@ -20,7 +20,7 @@ Para que la subida de imágenes funcione correctamente, **DEBES** crear un uploa
 - Configura los siguientes valores:
 
 #### Configuración básica:
-- **Preset name**: `empresa-logos-unsigned`
+- **Preset name**: `ml_default`
 - **Signing Mode**: **Unsigned** ⚠️ (MUY IMPORTANTE)
 - **Use filename**: ✅ Activado
 - **Unique filename**: ✅ Activado
@@ -29,12 +29,12 @@ Para que la subida de imágenes funcione correctamente, **DEBES** crear un uploa
 #### Configuración de archivos:
 - **Resource type**: `Image`
 - **Allowed formats**: `jpg,png,gif,webp,jpeg`
-- **Max file size**: `5000000` (5MB)
+- **Max file size**: `10000000` (10MB)
 - **Max image width**: `2000`
 - **Max image height**: `2000`
 
 #### Configuración de carpeta:
-- **Folder**: `empresa-logos`
+- **Folder**: `form-uploads`
 
 ### 4. Guardar el preset
 - Haz clic en **"Save"**
@@ -42,16 +42,15 @@ Para que la subida de imágenes funcione correctamente, **DEBES** crear un uploa
 ## ✅ Verificación
 
 Una vez creado el preset, deberías ver:
-- Nombre: `empresa-logos-unsigned`
+- Nombre: `ml_default`
 - Modo: `Unsigned`
 - Estado: `Enabled`
 
 ## 🔧 Variables de entorno
 
-Verifica que tu archivo `.env` contenga:
-```
+```env
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=tu_cloud_name
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=empresa-logos-unsigned
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=ml_default
 ```
 
 ## 🚨 Solución de problemas
@@ -67,18 +66,13 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=empresa-logos-unsigned
 3. Verifica las variables de entorno
 
 ### Si el upload falla:
-1. Verifica los formatos permitidos
-2. Confirma el tamaño máximo del archivo
-3. Revisa la configuración de la carpeta
+1. Verifica el tamaño del archivo (máximo 10MB)
+2. Confirma que el formato sea compatible
+3. Revisa la consola del navegador para más detalles
 
 ## 📝 Notas importantes
 
-<mcreference link="https://cloudinary.com/documentation/upload_presets" index="1">1</mcreference> Los presets unsigned son necesarios para uploads desde el cliente <mcreference link="https://next.cloudinary.dev/clduploadwidget/basic-usage" index="2">2</mcreference>
-
-<mcreference link="https://cloudinary.com/documentation/upload_widget" index="3">3</mcreference> Los uploads unsigned tienen limitaciones de seguridad pero son ideales para aplicaciones cliente <mcreference link="https://flaviocopes.com/cloudinary-fix-upload-preset-not-found/" index="4">4</mcreference>
-
-<mcreference link="https://cloudinary.com/documentation/upload_images" index="5">5</mcreference> Solo ciertos parámetros están disponibles en uploads unsigned por razones de seguridad
-
----
-
-**Después de crear el preset, reinicia el servidor de desarrollo para que los cambios surtan efecto.**
+- El preset `ml_default` es el preset por defecto de Cloudinary
+- Si no tienes este preset, puedes crearlo siguiendo los pasos anteriores
+- Alternativamente, puedes usar cualquier preset unsigned que tengas configurado
+- Solo cambia el valor en `.env.local` por el nombre de tu preset
