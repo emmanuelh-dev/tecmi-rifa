@@ -8,12 +8,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import EmpresaRegistrationForm from '@/components/EmpresaForm';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { CAREERS } from '@/app/data/constants';
+import Link from 'next/link';
 
 interface Empresa {
     created_at: string;
     nombreColaborador: string;
     nombreEmpresa: string;
     carreraBuscada: string;
+    logo?: string;
+    descripcion?: string;
+    correo?: string;
+    telefono?: string;
 }
 
 export default function EmpresasListPage() {
@@ -63,15 +68,21 @@ export default function EmpresasListPage() {
                             Listado de empresas participantes en la feria de empleo
                         </p>
                     </div>
+                    <Link href="/empresa-registro">
+                        <Button className="bg-white text-custom-green hover:bg-gray-100">
+                            Página de Registro de Empresas
+                        </Button>
+                    </Link>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button className="bg-white text-custom-green hover:bg-gray-100">
-                                Registrar Empresa
+                            <Button variant="outline" className="bg-white text-custom-green hover:bg-gray-100">
+                                Ver Formulario de Empresa
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
+                        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
                             <DialogHeader>
-                                <DialogTitle>Registrar Nueva Empresa</DialogTitle>
+                                <DialogTitle>Formulario de Empresa (Solo Vista)</DialogTitle>
+                                <p className="text-sm text-gray-600">Este formulario es solo para que veas las preguntas. Las empresas deben usar la página pública.</p>
                             </DialogHeader>
                             <EmpresaRegistrationForm />
                         </DialogContent>
@@ -96,18 +107,48 @@ export default function EmpresasListPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Logo</TableHead>
                                     <TableHead>Empresa</TableHead>
                                     <TableHead>Colaborador</TableHead>
                                     <TableHead>Carreras Buscadas</TableHead>
+                                    <TableHead>Contacto</TableHead>
                                     <TableHead>Fecha de Registro</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {filteredEmpresas.map((empresa, index) => (
                                     <TableRow key={index}>
+                                        <TableCell>
+                                            {empresa.logo ? (
+                                                <img
+                                                    src={empresa.logo}
+                                                    alt={`Logo de ${empresa.nombreEmpresa}`}
+                                                    className="w-12 h-12 object-contain rounded"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                                        if (nextElement) {
+                                                            nextElement.style.display = 'flex';
+                                                        }
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div
+                                                className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500"
+                                                style={{ display: empresa.logo ? 'none' : 'flex' }}
+                                            >
+                                                Sin logo
+                                            </div>
+                                        </TableCell>
                                         <TableCell className="font-medium">{empresa.nombreEmpresa}</TableCell>
                                         <TableCell>{empresa.nombreColaborador}</TableCell>
                                         <TableCell>{getCareerNames(empresa.carreraBuscada)}</TableCell>
+                                        <TableCell>
+                                            <div className="text-sm">
+                                                {empresa.correo && <div>{empresa.correo}</div>}
+                                                {empresa.telefono && <div>{empresa.telefono}</div>}
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             {new Date(empresa.created_at).toLocaleDateString('es-MX')}
                                         </TableCell>

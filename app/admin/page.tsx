@@ -57,7 +57,7 @@ export default function AdminPage() {
       if (error) throw error;
 
       toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} eliminado con éxito`);
-      
+
       // Refresh data
       if (type === 'student') {
         const { data } = await supabase.from('RegistroTecmi').select('*');
@@ -97,7 +97,7 @@ export default function AdminPage() {
       if (error) throw error;
 
       toast.success(`${type === 'student' ? 'Estudiante' : 'Empresa'} actualizado con éxito`);
-      
+
       // Refresh data
       if (type === 'student') {
         const { data } = await supabase.from('RegistroTecmi').select('*');
@@ -287,19 +287,12 @@ export default function AdminPage() {
             <p className="text-lg text-gray-300">Selección de ganadores de la rifa</p>
           </div>
           <div className="flex gap-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-white text-custom-green hover:bg-gray-100">
-                  Registrar Empresa
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Registrar Nueva Empresa</DialogTitle>
-                </DialogHeader>
-                <EmpresaRegistrationForm />
-              </DialogContent>
-            </Dialog>
+            <Link href="/admin/empresas">
+              <Button className="bg-white text-custom-green hover:bg-gray-100">
+                Lista de empresas
+              </Button>
+            </Link>
+
             <Link href="/winner">
               <Button variant="outline" className="bg-white text-admin-blue hover:bg-gray-100">
                 Selección de Ganador
@@ -540,7 +533,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Empresas Registradas */}
-        <Card className="bg-white border border-gray-200 shadow-lg mt-6">
+        {/* <Card className="bg-white border border-gray-200 shadow-lg mt-6">
           <CardHeader>
             <CardTitle>Lista De Empresas</CardTitle>
           </CardHeader>
@@ -587,7 +580,7 @@ export default function AdminPage() {
               </table>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Delete Confirmation Dialog */}

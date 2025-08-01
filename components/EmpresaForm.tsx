@@ -23,12 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createClient } from '@/lib/supabase/client';
+import CloudinaryUpload from '@/components/CloudinaryUpload';
 
 const formSchema = z.object({
   nombreEmpresa: z.string().min(2, 'El nombre de la empresa debe tener al menos 2 caracteres'),
@@ -58,10 +54,15 @@ const formSchema = z.object({
   nombresPersonasExtras: z.array(z.string()).optional(),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 export default function EmpresaRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [empresaId, setEmpresaId] = useState<string | null>(null);
+  const supabase = createClient();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       nombreEmpresa: '',
@@ -91,27 +92,81 @@ export default function EmpresaRegistrationForm() {
   });
 
   const watchAcompanante = form.watch('llevaAcompanante');
-  const watchStand = form.watch('requiereStand');
-  const watchBolsa = form.watch('participaBolsa');
   const watchArticulos = form.watch('traeArticulos');
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  useEffect(() => {
+    const savedData = localStorage.getItem('empresa-registro-data');
+    const savedId = localStorage.getItem('empresa-registro-id');
+    
+    if (savedData && savedId) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        form.reset(parsedData);
+        setEmpresaId(savedId);
+        setIsEditing(true);
+        toast.info('Se cargaron los datos guardados. Puedes continuar editando.');
+      } catch (error) {
+        console.error('Error al cargar datos guardados:', error);
+        localStorage.removeItem('empresa-registro-data');
+        localStorage.removeItem('empresa-registro-id');
+      }
+    }
+  }, [form]);
+
+  async function onSubmit(values: FormData) {
     setIsSubmitting(true);
+    console.log('📝 Form submission values:', values);
+    console.log('🖼️ Logo value in form:', values.logo);
+    
     try {
       const carrerasTexto = values.carreraBuscada.join(',');
+      const dataToSave = {
+        ...values,
+        carreraBuscada: carrerasTexto,
+        tipoUsuario: 'empresa',
+        // Asegurar que los campos numéricos sean null si están vacíos
+        cantidadPersonasExtras: values.cantidadPersonasExtras || null,
+        // Limpiar campos de texto vacíos
+        personasExtras: values.personasExtras || null,
+        nombreAcompañante: values.nombreAcompañante || null,
+        correo2: values.correo2 || null,
+        telefono2: values.telefono2 || null,
+        articulo: values.articulo || null,
+        logo: values.logo || null,
+        descripcion: values.descripcion || null,
+      };
+      
+      console.log('💾 Data to save:', dataToSave);
+      console.log('🖼️ Logo in dataToSave:', dataToSave.logo);
 
-      const { error } = await supabase.from('RegistroEmpresas').insert([
-        {
-          ...values,
-          carreraBuscada: carrerasTexto,
-          tipoUsuario: 'empresa',
-        },
-      ]);
+      if (isEditing && empresaId) {
+        const { error } = await supabase
+          .from('RegistroEmpresas')
+          .update(dataToSave)
+          .eq('id', empresaId);
 
-      if (error) throw error;
+        if (error) throw error;
+        
+        localStorage.setItem('empresa-registro-data', JSON.stringify(values));
+        toast.success('¡Registro actualizado exitosamente!');
+      } else {
+        const { data, error } = await supabase
+          .from('RegistroEmpresas')
+          .insert([dataToSave])
+          .select('id')
+          .single();
 
-      toast.success('¡Registro exitoso!');
-      form.reset();
+        if (error) throw error;
+
+        if (data?.id) {
+          localStorage.setItem('empresa-registro-data', JSON.stringify(values));
+          localStorage.setItem('empresa-registro-id', data.id);
+          setEmpresaId(data.id);
+          setIsEditing(true);
+        }
+
+        toast.success('¡Registro exitoso! Puedes volver a editar este formulario más tarde.');
+      }
     } catch (error) {
       console.error(error);
       toast.error('Error al registrar');
@@ -125,9 +180,33 @@ export default function EmpresaRegistrationForm() {
     field.onChange(nuevasCarreras);
   };
 
+  const clearLocalData = () => {
+    localStorage.removeItem('empresa-registro-data');
+    localStorage.removeItem('empresa-registro-id');
+    setIsEditing(false);
+    setEmpresaId(null);
+    form.reset();
+    toast.success('Formulario reiniciado');
+  };
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="space-y-4">
+      {isEditing && (
+        <div className="text-center space-y-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm text-green-600">Estás editando un registro existente</p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={clearLocalData}
+            className="text-red-600 border-red-600 hover:bg-red-50"
+          >
+            Crear Nuevo Registro
+          </Button>
+        </div>
+      )}
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Campos principales */}
         <FormField
@@ -493,15 +572,19 @@ export default function EmpresaRegistrationForm() {
           />
         )}
 
-        {/* Otros campos */}
+        {/* Logo */}
         <FormField
           control={form.control}
           name="logo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL del logo</FormLabel>
+              <FormLabel>Logo de la empresa</FormLabel>
               <FormControl>
-                <Input placeholder="https://..." {...field} />
+                <CloudinaryUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  onRemove={() => field.onChange('')}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -541,14 +624,15 @@ export default function EmpresaRegistrationForm() {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          className="w-full bg-black text-white hover:bg-black/90"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Registrando...' : 'Registrar empresa'}
-        </Button>
-      </form>
-    </Form>
+          <Button
+            type="submit"
+            className="w-full bg-black text-white hover:bg-black/90"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (isEditing ? 'Actualizando...' : 'Registrando...') : (isEditing ? 'Actualizar empresa' : 'Registrar empresa')}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 }

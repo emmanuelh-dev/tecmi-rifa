@@ -19,7 +19,7 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
             <RegistrationForm />
             <div className="mt-6 text-center">
-              <Link href="/empresa">
+              <Link href="/empresa-registro">
                 <Button className="bg-custom-green text-white hover:bg-custom-green/90">
                   Registrar empresa
                 </Button>
