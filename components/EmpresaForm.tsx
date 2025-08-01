@@ -97,7 +97,7 @@ export default function EmpresaRegistrationForm() {
   useEffect(() => {
     const savedData = localStorage.getItem('empresa-registro-data');
     const savedId = localStorage.getItem('empresa-registro-id');
-    
+
     if (savedData && savedId) {
       try {
         const parsedData = JSON.parse(savedData);
@@ -117,7 +117,7 @@ export default function EmpresaRegistrationForm() {
     setIsSubmitting(true);
     console.log('📝 Form submission values:', values);
     console.log('🖼️ Logo value in form:', values.logo);
-    
+
     try {
       const carrerasTexto = values.carreraBuscada.join(',');
       const dataToSave = {
@@ -135,7 +135,7 @@ export default function EmpresaRegistrationForm() {
         logo: values.logo || null,
         descripcion: values.descripcion || null,
       };
-      
+
       console.log('💾 Data to save:', dataToSave);
       console.log('🖼️ Logo in dataToSave:', dataToSave.logo);
 
@@ -146,7 +146,7 @@ export default function EmpresaRegistrationForm() {
           .eq('id', empresaId);
 
         if (error) throw error;
-        
+
         localStorage.setItem('empresa-registro-data', JSON.stringify(values));
         toast.success('¡Registro actualizado exitosamente!');
       } else {
@@ -194,9 +194,9 @@ export default function EmpresaRegistrationForm() {
       {isEditing && (
         <div className="text-center space-y-2 p-4 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-sm text-green-600">Estás editando un registro existente</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={clearLocalData}
             className="text-red-600 border-red-600 hover:bg-red-50"
           >
@@ -204,426 +204,400 @@ export default function EmpresaRegistrationForm() {
           </Button>
         </div>
       )}
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-        {/* Campos principales */}
-        <FormField
-          control={form.control}
-          name="nombreEmpresa"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre de la empresa</FormLabel>
-              <FormControl>
-                <Input placeholder="Mi Empresa S.A. de C.V" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="ubicacion"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ubicación</FormLabel>
-              <FormControl>
-                <Input placeholder="Ciudad, Estado, Municipio, Calle y C.P" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="nombreColaborador"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre del colaborador</FormLabel>
-              <FormControl>
-                <Input placeholder="Hernesto Guerrero" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="cargo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cargo</FormLabel>
-              <FormControl>
-                <Input placeholder="Ejemplo: Reclutador" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="correo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Correo electrónico</FormLabel>
-              <FormControl>
-                <Input placeholder="correo@empresa.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="telefono"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Teléfono</FormLabel>
-              <FormControl>
-                <Input placeholder="555-555-5555" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* ¿Llevarás acompañante? */}
-        <FormField
-          control={form.control}
-          name="llevaAcompanante"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Llevarás acompañante?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value ? "SI" : field.value === false ? "NO" : ""}
-                  onChange={e => field.onChange(e.target.value === "SI")}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Campos de acompañante solo si llevaAcompanante es true */}
-        {watchAcompanante && (
-          <>
-            <FormField
-              control={form.control}
-              name="nombreAcompañante"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre del acompañante</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nombre del acompañante" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="correo2"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Correo del acompañante</FormLabel>
-                  <FormControl>
-                    <Input placeholder="correo@ejemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="telefono2"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono del acompañante</FormLabel>
-                  <FormControl>
-                    <Input placeholder="555-555-5555" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-
-        {/* ¿Llevarás personas extras? */}
-        <FormField
-          control={form.control}
-          name="llevaPersonasExtras"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Llevarás personas extras?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value ? "SI" : field.value === false ? "NO" : ""}
-                  onChange={e => field.onChange(e.target.value === "SI")}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Si lleva personas extras, pide la cantidad */}
-        {form.watch('llevaPersonasExtras') && (
+          {/* Campos principales */}
           <FormField
             control={form.control}
-            name="cantidadPersonasExtras"
+            name="nombreEmpresa"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>¿Cuántas personas adicionales asistirán?</FormLabel>
+                <FormLabel>Nombre de la empresa</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    placeholder="0"
-                    {...field}
-                    onChange={e => field.onChange(Number(e.target.value))}
+                  <Input placeholder="Mi Empresa S.A. de C.V" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="descripcion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Descripción de la empresa</FormLabel>
+                <FormControl>
+                  <Input placeholder="Breve descripción" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="ubicacion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ubicación</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ciudad, Estado, Municipio, Calle y C.P" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="nombreColaborador"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre del colaborador</FormLabel>
+                <FormControl>
+                  <Input placeholder="Hernesto Guerrero" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="cargo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cargo</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ejemplo: Reclutador" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="correo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Correo electrónico</FormLabel>
+                <FormControl>
+                  <Input placeholder="correo@empresa.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="telefono"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Whatsapp</FormLabel>
+                <FormControl>
+                  <Input placeholder="555-555-5555" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ¿Llevarás acompañante? */}
+          <FormField
+            control={form.control}
+            name="llevaAcompanante"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>¿Llevarás acompañante?</FormLabel>
+                <FormControl>
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value ? "SI" : field.value === false ? "NO" : ""}
+                    onChange={e => field.onChange(e.target.value === "SI")}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">Sí</option>
+                    <option value="NO">No</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Campos de acompañante solo si llevaAcompanante es true */}
+          {watchAcompanante && (
+            <>
+              <FormField
+                control={form.control}
+                name="nombreAcompañante"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del acompañante</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre del acompañante" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="correo2"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo del acompañante</FormLabel>
+                    <FormControl>
+                      <Input placeholder="correo@ejemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="telefono2"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Teléfono del acompañante</FormLabel>
+                    <FormControl>
+                      <Input placeholder="555-555-5555" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+
+          {/* ¿Llevarás personas extras? */}
+          <FormField
+            control={form.control}
+            name="llevaPersonasExtras"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>¿Llevarás personas extras?</FormLabel>
+                <FormControl>
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value ? "SI" : field.value === false ? "NO" : ""}
+                    onChange={e => field.onChange(e.target.value === "SI")}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">Sí</option>
+                    <option value="NO">No</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Si lleva personas extras, pide la cantidad */}
+          {form.watch('llevaPersonasExtras') && (
+            <FormField
+              control={form.control}
+              name="cantidadPersonasExtras"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>¿Cuántas personas adicionales asistirán?</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      placeholder="0"
+                      {...field}
+                      onChange={e => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {/* Genera los campos para los nombres de las personas extras */}
+          {form.watch('llevaPersonasExtras') && (form.watch('cantidadPersonasExtras') ?? 0) > 0 &&
+            Array.from({ length: form.watch('cantidadPersonasExtras') ?? 0 }).map((_, idx) => (
+              <FormField
+                key={idx}
+                control={form.control}
+                name={`nombresPersonasExtras.${idx}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{`Nombre de la persona extra #${idx + 1}`}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={`Nombre de la persona #${idx + 1}`} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))
+          }
+
+          {/* Nivel vacante */}
+          <FormField
+            control={form.control}
+            name="nivelVacante"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nivel de vacante</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ejemplo: Practicas(estudiantes) o Tiempo Completo(egresado)" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Carreras buscadas */}
+          <FormField
+            control={form.control}
+            name="carreraBuscada"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Carreras buscadas</FormLabel>
+                <Select
+                  onValueChange={(value) => {
+                    if (!field.value.includes(value)) {
+                      field.onChange([...field.value, value]);
+                    }
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona carreras" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {CAREERS.map((career) => (
+                      <SelectItem key={career.id} value={career.id}>
+                        {career.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="mt-2 space-y-2">
+                  {field.value.map((id) => {
+                    const career = CAREERS.find((c) => c.id === id);
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center justify-between bg-gray-100 p-2 rounded-md"
+                      >
+                        <span>{career?.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => handleRemoveCareer(id, field)}
+                        >
+                          Eliminar
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ¿Requiere stand? */}
+          <FormField
+            control={form.control}
+            name="requiereStand"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>¿Requiere stand?</FormLabel>
+                <span>
+                  <p className="text-sm text-neutral-500">
+                    Si no cuentas con stand, nosotros te proporcionaremos
+                  </p>
+                  <p className="text-sm text-neutral-500">
+                    1 mesa sin mantel de 1.5 m de largo
+                    Sillas para los asistentes 📌 Importante: debes traer tu propio mantel y materiales decorativos. El espacio asignado será de aproximadamente 1.5 metros.
+                  </p>
+                </span>
+                <FormControl>
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value ? "SI" : field.value === false ? "NO" : ""}
+                    onChange={e => field.onChange(e.target.value === "SI")}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">✅ Sí, traeremos nuestro stand</option>
+                    <option value="NO">❌ No, requerimos el mobiliario que proporcionan</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* ¿Participa la empresa en la bolsa de empleo? */}
+          <FormField
+            control={form.control}
+            name="participaBolsa"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>¿Está inscrito en la bolsa?</FormLabel>
+                <FormControl>
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value ? "SI" : field.value === false ? "NO" : ""}
+                    onChange={e => field.onChange(e.target.value === "SI")}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">Sí</option>
+                    <option value="NO">No</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Logo */}
+          <FormField
+            control={form.control}
+            name="logo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Logo de la empresa</FormLabel>
+                <FormControl>
+                  <CloudinaryUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    onRemove={() => field.onChange('')}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        )}
 
-        {/* Genera los campos para los nombres de las personas extras */}
-        {form.watch('llevaPersonasExtras') && (form.watch('cantidadPersonasExtras') ?? 0) > 0 &&
-          Array.from({ length: form.watch('cantidadPersonasExtras') ?? 0 }).map((_, idx) => (
-            <FormField
-              key={idx}
-              control={form.control}
-              name={`nombresPersonasExtras.${idx}`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{`Nombre de la persona extra #${idx + 1}`}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={`Nombre de la persona #${idx + 1}`} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))
-        }
-
-        {/* Nivel vacante */}
-        <FormField
-          control={form.control}
-          name="nivelVacante"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nivel de vacante</FormLabel>
-              <FormControl>
-                <Input placeholder="Ejemplo: Practicas(estudiantes) o Tiempo Completo(egresado)" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Carreras buscadas */}
-        <FormField
-          control={form.control}
-          name="carreraBuscada"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Carreras buscadas</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  if (!field.value.includes(value)) {
-                    field.onChange([...field.value, value]);
-                  }
-                }}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona carreras" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {CAREERS.map((career) => (
-                    <SelectItem key={career.id} value={career.id}>
-                      {career.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="mt-2 space-y-2">
-                {field.value.map((id) => {
-                  const career = CAREERS.find((c) => c.id === id);
-                  return (
-                    <div
-                      key={id}
-                      className="flex items-center justify-between bg-gray-100 p-2 rounded-md"
-                    >
-                      <span>{career?.name}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleRemoveCareer(id, field)}
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* ¿Requiere stand? */}
-        <FormField
-          control={form.control}
-          name="requiereStand"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Requiere stand?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value ? "SI" : field.value === false ? "NO" : ""}
-                  onChange={e => field.onChange(e.target.value === "SI")}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* ¿Participa la empresa en la bolsa de empleo? */}
-        <FormField
-          control={form.control}
-          name="participaBolsa"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Está inscrito en la bolsa?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value ? "SI" : field.value === false ? "NO" : ""}
-                  onChange={e => field.onChange(e.target.value === "SI")}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="traeArticulos"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Trae artículos promocionales?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value ? "SI" : field.value === false ? "NO" : ""}
-                  onChange={e => field.onChange(e.target.value === "SI")}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {watchArticulos && (
           <FormField
             control={form.control}
-            name="articulo"
+            name="autorizacion"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>¿Qué artículos?</FormLabel>
+                <FormLabel>¿Autoriza el uso de sus datos?</FormLabel>
                 <FormControl>
-                  <Input placeholder="Describe los artículos" {...field} />
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value}
+                    onChange={e => field.onChange(e.target.value)}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">Sí</option>
+                    <option value="NO">No</option>
+                  </select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        )}
-
-        {/* Logo */}
-        <FormField
-          control={form.control}
-          name="logo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Logo de la empresa</FormLabel>
-              <FormControl>
-                <CloudinaryUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  onRemove={() => field.onChange('')}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="descripcion"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descripción de la empresa</FormLabel>
-              <FormControl>
-                <Input placeholder="Breve descripción" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="autorizacion"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>¿Autoriza el uso de sus datos?</FormLabel>
-              <FormControl>
-                <select
-                  className="border rounded px-3 py-2 w-full"
-                  value={field.value}
-                  onChange={e => field.onChange(e.target.value)}
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="SI">Sí</option>
-                  <option value="NO">No</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-black/90"
