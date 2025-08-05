@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image';
+import MainLayout from '@/Layouts/MainLayout';
 
 export default function Home() {
   const empresas = [
@@ -19,21 +20,11 @@ export default function Home() {
   ]
 
   return (
+    <MainLayout>
+
     <div className="min-h-screen bg-gradient-to-br from-tecmilenio-50 via-white to-tecmilenio-50">
       {/* Header */}
-      <header className="border-b border-tecmilenio-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Image src="/logo.png" alt="TecMilenio Logo" width={200} height={100} className="h-12 w-auto" />
-            <Button
-              variant="outline"
-              className="border-tecmilenio-200 text-tecmilenio-700 hover:bg-tecmilenio-50 bg-transparent"
-            >
-              Contacto
-            </Button>
-          </div>
-        </div>
-      </header>
+
 
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
@@ -54,10 +45,10 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button size="lg" className="bg-tecmilenio hover:bg-tecmilenio-700 text-white px-8 py-3 text-lg">
+              <a href="/empresas">            <Button size="lg" className="bg-tecmilenio hover:bg-tecmilenio-700 text-white px-8 py-3 text-lg">
                 Explorar Empresas
                 <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              </Button></a>
               <a href="/#registro">
                 <Button
                   variant="outline"
@@ -122,12 +113,12 @@ export default function Home() {
 
           <div className="text-center">
             <p className="text-gray-600 mb-4">Y muchas más empresas por confirmar</p>
-            <Button
-              variant="outline"
-              className="border-tecmilenio-200 text-tecmilenio-700 hover:bg-tecmilenio-50 bg-transparent"
-            >
-              Ver Lista Completa
-            </Button>
+            <a href="/empresas">
+              <Button className="bg-tecmilenio hover:bg-tecmilenio-700 text-white px-6 py-3 text-lg">
+                Ver Todas las Empresas
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </a>
           </div>
         </div>
       </section>
@@ -137,21 +128,16 @@ export default function Home() {
             <Gift className="w-16 h-16 text-tecmilenio mx-auto mb-4" />
             <h2 className="text-3xl sm:text-4xl font-bold text-tecmilenio mb-4 text-center">Registra tu Visita</h2>
             <p className="text-xl text-tecmilenio max-w-2xl mx-auto">
-              Todos los participantes registrados entrarán automáticamente en nuestra rifa especial
+              Todos los participantes registrados entrarán automáticamente en nuestra rifa
             </p>
           </div>
           <RegistrationForm />
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Emmanuel H. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+
     </div>
+        </MainLayout>
+
   )
 }

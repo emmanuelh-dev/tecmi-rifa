@@ -1,101 +1,133 @@
-'use client'
-import React, { useState } from "react"
-import { useRouter } from 'next/navigation';
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
-import Image from "next/image";
+import { Building2, Mail, Lock, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 export default function LoginPage() {
-    const router = useRouter()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
 
-        try {
-            const supabase = createClient()
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            })
-            if (error) throw error
-            toast.success('Inicio de sesión exitoso')
-            const returnPath = localStorage.getItem('returnPath') || '/admin'
-            localStorage.removeItem('returnPath')
-            router.push(returnPath)
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-        } catch (error) {
-            toast.error('Error al iniciar sesión')
-        } finally {
-            setIsLoading(false)
-        }
+      if (error) throw error
+
+      toast.success("Inicio de sesión exitoso")
+      const returnPath = localStorage.getItem("returnPath") || "/admin"
+      localStorage.removeItem("returnPath")
+      router.push(returnPath)
+    } catch (error) {
+      toast.error("Error al iniciar sesión")
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    return (
-        <div className="h-screen flex flex-col md:flex-row items-center justify-center p-4 bg-gradient-to-br from-custom-green to-emerald-700">
-            <div className="lg:w-1/2 hidden lg:flex flex-col items-center justify-center p-4">
-                <div className="relative w-full max-w-xl">
-                    <Image
-                        src="/feria.jpg"
-                        alt="Feria de Empleo"
-                        width={500}
-                        height={500}
-                        className="rounded-2xl shadow-2xl object-cover z-10 relative"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-black/20 rounded-2xl z-1"></div>
-                </div>
-                <h1 className="text-3xl font-bold text-white mt-4 text-center">Feria de Empleo TECMI</h1>
-                <p className="text-lg text-gray-200 mt-2 text-center max-w-lg">Conectando talento con oportunidades</p>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-tecmilenio-50 via-white to-tecmilenio-50 flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="w-full max-w-md mx-auto lg:mx-0">
+        {/* Back to Home Link */}
+        <Link
+          href="/"
+          className="inline-flex items-center text-tecmilenio-700 hover:text-tecmilenio mb-6 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver al inicio
+        </Link>
 
-            <div className="lg:w-1/2 w-full max-w-md p-2">
-                <div className="flex flex-col items-center justify-center w-full">
-                    <Image
-                        src="/logo.png"
-                        alt="Feria de Empleo"
-                        width={200}
-                        height={200}
-                        className="w-full py-10"
-                        priority
-                    />
-                    <form onSubmit={handleLogin} className="space-y-4 w-full">
-                        <div className="space-y-2">
-                            <Input
-                                type="email"
-                                placeholder="Correo electrónico"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Input
-                                type="password"
-                                placeholder="Contraseña"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="h-10 px-4 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
-                                required
-                            />
-                        </div>
-                        <Button
-                            type="submit"
-                            className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200 text-base font-medium"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-                        </Button>
-                    </form>
-                </div>
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center pb-6">
+            <div className="w-12 h-12 bg-tecmilenio rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Building2 className="w-6 h-6 text-white" />
             </div>
+            <CardTitle className="text-2xl font-bold text-gray-900">Iniciar Sesión</CardTitle>
+            <p className="text-gray-600 mt-2">Accede al panel administrativo</p>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    type="email"
+                    placeholder="Correo electrónico"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-tecmilenio focus:ring-tecmilenio"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    type="password"
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-tecmilenio focus:ring-tecmilenio"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-12 bg-tecmilenio hover:bg-tecmilenio-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Iniciando sesión...
+                  </div>
+                ) : (
+                  "Iniciar Sesión"
+                )}
+              </Button>
+            </form>
+
+            <div className="text-center pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500">
+                ¿Problemas para acceder?{" "}
+                <a
+                  href="mailto:soporte@tecmilenio.mx"
+                  className="text-tecmilenio hover:text-tecmilenio-700 font-medium"
+                >
+                  Contacta soporte
+                </a>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile Branding */}
+        <div className="lg:hidden text-center mt-8">
+          <p className="text-gray-600">Feria de Empleo TecMilenio 2024</p>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
