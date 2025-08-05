@@ -41,11 +41,12 @@ export default function EmpresasPage() {
     return (
         <MainLayout>
             <h1 className="text-3xl font-bold text-center mb-8">Empresas Participantes</h1>
+            <div className="max-w-3xl mx-auto">
 
             {isLoading ? (
                 <div className="text-center">Cargando empresas...</div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 mb-12 group/grid">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-8 mb-12 group/grid">
                     {empresas.map((empresa, index) => (
                         <Card key={index} className="border-0 shadow-sm hover:shadow-md transition-all duration-300 group opacity-100 group-hover/grid:opacity-50 hover:!opacity-100">
                             <CardContent className="p-6 flex items-center justify-center h-24">
@@ -59,6 +60,7 @@ export default function EmpresasPage() {
                     ))}
                 </div>
             )}
+            </div>
         </MainLayout>
     )
 }
