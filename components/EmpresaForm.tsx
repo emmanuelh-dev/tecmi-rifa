@@ -470,10 +470,6 @@ export default function EmpresaRegistrationForm() {
                           tipo: 'practicas',
                           descripcion: 'Prácticas profesionales - Para estudiantes'
                         },
-                        'servicio-social': {
-                          tipo: 'servicio-social',
-                          descripcion: 'Servicio social - Para estudiantes'
-                        },
                         'proyecto': {
                           tipo: 'proyecto',
                           descripcion: 'Por proyecto - Trabajo temporal'
