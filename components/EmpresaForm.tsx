@@ -38,7 +38,10 @@ const formSchema = z.object({
   correo2: z.string().optional(),
   telefono2: z.string().optional(),
   personasExtras: z.string().optional(),
-  nivelVacante: z.string(),
+  nivelVacante: z.array(z.object({
+    tipo: z.string(),
+    descripcion: z.string(),
+  })).min(1, 'Selecciona al menos un nivel de vacante'),
   carreraBuscada: z.array(z.string()).min(1, 'Selecciona al menos una carrera'),
   requiereStand: z.boolean().optional(),
   participaBolsa: z.boolean().optional(),
@@ -76,7 +79,7 @@ export default function EmpresaRegistrationForm() {
       correo2: '',
       telefono2: '',
       personasExtras: '',
-      nivelVacante: '',
+      nivelVacante: [],
       carreraBuscada: [],
       requiereStand: false,
       participaBolsa: false,
@@ -101,6 +104,13 @@ export default function EmpresaRegistrationForm() {
     if (savedData && savedId) {
       try {
         const parsedData = JSON.parse(savedData);
+        // Si nivelVacante es un string (datos antiguos), convertirlo al nuevo formato
+        if (typeof parsedData.nivelVacante === 'string') {
+          parsedData.nivelVacante = [];
+        } else if (parsedData.nivelVacante && !Array.isArray(parsedData.nivelVacante)) {
+          // Si es un objeto (formato anterior), convertir a array
+          parsedData.nivelVacante = [parsedData.nivelVacante];
+        }
         form.reset(parsedData);
         setEmpresaId(savedId);
         setIsEditing(true);
@@ -123,6 +133,7 @@ export default function EmpresaRegistrationForm() {
       const dataToSave = {
         ...values,
         carreraBuscada: carrerasTexto,
+        nivelVacante: JSON.stringify(values.nivelVacante), // Convertir a JSON string
         tipoUsuario: 'empresa',
         // Asegurar que los campos numéricos sean null si están vacíos
         cantidadPersonasExtras: values.cantidadPersonasExtras || null,
@@ -442,10 +453,89 @@ export default function EmpresaRegistrationForm() {
             name="nivelVacante"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nivel de vacante</FormLabel>
+                <FormLabel>Nivel de vacante (puedes seleccionar múltiples opciones)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ejemplo: Practicas(estudiantes) o Tiempo Completo(egresado)" {...field} />
+                  <Select
+                    onValueChange={(value) => {
+                      const opcionesVacante = {
+                        'medio-tiempo': {
+                          tipo: 'medio-tiempo',
+                          descripcion: 'Medio tiempo - Para estudiantes activos'
+                        },
+                        'tiempo-completo': {
+                          tipo: 'tiempo-completo',
+                          descripcion: 'Tiempo completo - Para egresados'
+                        },
+                        'practicas': {
+                          tipo: 'practicas',
+                          descripcion: 'Prácticas profesionales - Para estudiantes'
+                        },
+                        'servicio-social': {
+                          tipo: 'servicio-social',
+                          descripcion: 'Servicio social - Para estudiantes'
+                        },
+                        'proyecto': {
+                          tipo: 'proyecto',
+                          descripcion: 'Por proyecto - Trabajo temporal'
+                        },
+                        'freelance': {
+                          tipo: 'freelance',
+                          descripcion: 'Freelance - Trabajo independiente'
+                        }
+                      };
+                      
+                      const selectedOption = opcionesVacante[value as keyof typeof opcionesVacante];
+                      if (selectedOption && !field.value.some((item: any) => item.tipo === selectedOption.tipo)) {
+                        field.onChange([...field.value, selectedOption]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona los tipos de vacante" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="medio-tiempo">Medio tiempo - Para estudiantes activos</SelectItem>
+                      <SelectItem value="tiempo-completo">Tiempo completo - Para egresados</SelectItem>
+                      <SelectItem value="practicas">Prácticas profesionales - Para estudiantes</SelectItem>
+                      <SelectItem value="servicio-social">Servicio social - Para estudiantes</SelectItem>
+                      <SelectItem value="proyecto">Por proyecto - Trabajo temporal</SelectItem>
+                      <SelectItem value="freelance">Freelance - Trabajo independiente</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
+                
+                {/* Mostrar opciones seleccionadas */}
+                <div className="mt-2 space-y-2">
+                  {field.value.map((vacante: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-blue-50 p-2 rounded-md border border-blue-200"
+                    >
+                      <div>
+                        <span className="font-medium text-blue-900">{vacante.descripcion}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newValue = field.value.filter((_: any, i: number) => i !== index);
+                          field.onChange(newValue);
+                        }}
+                        className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                {field.value.length === 0 && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Selecciona al menos un tipo de vacante
+                  </p>
+                )}
+                
                 <FormMessage />
               </FormItem>
             )}
