@@ -24,7 +24,7 @@ export default function Home() {
       <header className="border-b border-tecmilenio-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Image src="/logo.png" alt="TecMilenio Logo" width={32} height={32} className="h-8" />
+            <Image src="/logo.png" alt="TecMilenio Logo" width={200} height={100} className="h-12 w-auto" />
             <Button
               variant="outline"
               className="border-tecmilenio-200 text-tecmilenio-700 hover:bg-tecmilenio-50 bg-transparent"
