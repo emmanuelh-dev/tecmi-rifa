@@ -588,6 +588,11 @@ export default function EmpresaRegistrationForm() {
               </FormItem>
             )}
           />
+         <p className='text-gray-600 mb-4 text-sm'>
+              Requisito de participación:
+              Para enriquecer la experiencia del evento, solicitamos la donación de un artículo promocional “premium” como premio para una rifa destinada a los estudiantes participantes. (Ej. Bocina inteligentes / Auriculares Inalámbricos / Tarjetas de regalos / Smartwatch / Cámara deportiva / Kit de herramientas multiusos / etc)
+              __ Sí, confirmo de enterado y nos comprometemos a llevar la donación
+          </p>
 
           {/* ¿Requiere stand? */}
           <FormField
@@ -627,7 +632,7 @@ export default function EmpresaRegistrationForm() {
             name="participaBolsa"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>¿Está inscrito en la bolsa?</FormLabel>
+                <FormLabel>¿Está inscrito en la bolsa de empleo del Tecmilenio?"</FormLabel>
                 <FormControl>
                   <select
                     className="border rounded px-3 py-2 w-full"

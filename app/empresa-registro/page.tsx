@@ -16,11 +16,6 @@ export default function EmpresaRegistroPage() {
                 Completa el formulario para participar en la feria de empleo
               </p>
             </div>
-            <p className='text-gray-600 mb-4 text-sm'>
-              Requisito de participación:
-              Para enriquecer la experiencia del evento, solicitamos la donación de un artículo promocional “premium” como premio para una rifa destinada a los estudiantes participantes. (Ej. Bocina inteligentes / Auriculares Inalámbricos / Tarjetas de regalos / Smartwatch / Cámara deportiva / Kit de herramientas multiusos / etc)
-              __ Sí, confirmo de enterado y nos comprometemos a llevar la donación
-            </p>
             <EmpresaRegistrationForm />
           </div>
         </div>
