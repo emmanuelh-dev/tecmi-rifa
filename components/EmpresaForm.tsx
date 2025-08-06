@@ -730,6 +730,10 @@ export default function EmpresaRegistrationForm() {
               </FormItem>
             )}
           />
+
+          <div>
+            <p>Despues de enviar este formulario puedes volverlo a editar.</p>
+          </div>
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-black/90"
