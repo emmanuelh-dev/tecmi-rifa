@@ -31,11 +31,11 @@ export default function Home() {
             <div className="text-center max-w-4xl mx-auto">
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-tecmilenio-100 text-tecmilenio-800 text-sm font-medium mb-8">
                 <Calendar className="w-4 h-4 mr-2" />
-                Próximamente • 2025
+                Campus San Nicolás • 2025
               </div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Feria de <span className="text-tecmilenio">Empleo</span>
+                Feria del Empleo <span className="text-tecmilenio">Tecmilenio</span>
               </h1>
 
               <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">

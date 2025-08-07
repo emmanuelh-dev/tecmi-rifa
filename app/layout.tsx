@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/react"
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Feria de Empleo Tecmilenio Campus San Nicolás',
+  title: 'Feria del Empleo Tecmilenio Campus San Nicolás',
   description: 'Registra tus datos para participar en nuestra rifa y ganar un premio',
   openGraph: {
     title: 'Feria del Empleo Tecmilenio',
