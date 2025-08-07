@@ -470,10 +470,6 @@ export default function EmpresaRegistrationForm() {
                           tipo: 'practicas',
                           descripcion: 'Prácticas profesionales - Para estudiantes'
                         },
-                        'servicio-social': {
-                          tipo: 'servicio-social',
-                          descripcion: 'Servicio social - Para estudiantes'
-                        },
                         'proyecto': {
                           tipo: 'proyecto',
                           descripcion: 'Por proyecto - Trabajo temporal'
@@ -593,6 +589,7 @@ export default function EmpresaRegistrationForm() {
             )}
           />
 
+
           {/* ¿Requiere stand? */}
           <FormField
             control={form.control}
@@ -631,7 +628,7 @@ export default function EmpresaRegistrationForm() {
             name="participaBolsa"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>¿Está inscrito en la bolsa?</FormLabel>
+                <FormLabel>¿Está inscrito en la bolsa de empleo del Tecmilenio?"</FormLabel>
                 <FormControl>
                   <select
                     className="border rounded px-3 py-2 w-full"
@@ -647,6 +644,51 @@ export default function EmpresaRegistrationForm() {
               </FormItem>
             )}
           />
+
+          {/* Donación de artículo promocional */}
+          <FormField
+            control={form.control}
+            name="traeArticulos"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Donación de artículo promocional</FormLabel>
+                <div className="mb-4">
+                  <p className='text-gray-600 mb-4 text-sm'>
+                    Requisito de participación:
+                    Para enriquecer la experiencia del evento, solicitamos la donación de un artículo promocional "premium" como premio para una rifa destinada a los estudiantes participantes. (Ej. Bocina inteligentes / Auriculares Inalámbricos / Tarjetas de regalos / Smartwatch / Cámara deportiva / Kit de herramientas multiusos / etc)
+                  </p>
+                </div>
+                <FormControl>
+                  <select
+                    className="border rounded px-3 py-2 w-full"
+                    value={field.value ? "SI" : ""}
+                    onChange={e => field.onChange(e.target.value === "SI")}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="SI">✅ Sí, confirmo de enterado y nos comprometemos a llevar la donación</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Campo para especificar el artículo si confirma la donación */}
+          {watchArticulos && (
+            <FormField
+              control={form.control}
+              name="articulo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>¿Qué artículo donarán?</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Describe el artículo que donarán (ej. Smartwatch, Auriculares Bluetooth, etc.)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           {/* Logo */}
           <FormField
@@ -688,6 +730,10 @@ export default function EmpresaRegistrationForm() {
               </FormItem>
             )}
           />
+
+          <div>
+            <p>Despues de enviar este formulario puedes volverlo a editar.</p>
+          </div>
           <Button
             type="submit"
             className="w-full bg-black text-white hover:bg-black/90"

@@ -1,6 +1,6 @@
 import RegistrationForm from '@/components/RegistrationForm';
 
-import { ArrowRight, Building2, Calendar, Gift, MapPin, Users } from "lucide-react"
+import { ArrowRight, Building2, Calendar, Clock, Gift, MapPin, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import MainLayout from '@/Layouts/MainLayout';
@@ -59,28 +59,28 @@ export default function Home() {
                 </a>
               </div>
 
-              <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Building2 className="w-6 h-6 text-tecmilenio" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Grandes Empresas</h3>
-                  <p className="text-sm text-gray-600">Líderes en tecnología</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Calendar className="w-6 h-6 text-tecmilenio" />
                 </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Users className="w-6 h-6 text-tecmilenio" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Muchas Vacantes</h3>
-                  <p className="text-sm text-gray-600">Oportunidades únicas</p>
+                <h4 className="font-semibold text-gray-900 mb-1">09 de Octubre</h4>
+                <p className="text-sm text-gray-600">Feria de Empleo 2025</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Clock className="w-6 h-6 text-tecmilenio" />
                 </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <MapPin className="w-6 h-6 text-tecmilenio" />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Campus TecMilenio</h3>
-                  <p className="text-sm text-gray-600">Evento presencial</p>
+                <h4 className="font-semibold text-gray-900 mb-1">3:00PM a 8:00PM</h4>
+                <p className="text-sm text-gray-600">Horario del evento</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="w-6 h-6 text-tecmilenio" />
                 </div>
+                <h4 className="font-semibold text-gray-900 mb-1">Campus San Nicolás</h4>
+                <p className="text-sm text-gray-600">Universidad Tecmilenio</p>
+              </div>
               </div>
             </div>
           </div>
