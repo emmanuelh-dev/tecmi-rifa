@@ -35,7 +35,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Feria del Empleo <span className="text-tecmilenio">Tecmilenio</span>
+                Feria del Empleo <span className="text-tecmilenio block">San Nicolás</span>
               </h1>
 
               <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
