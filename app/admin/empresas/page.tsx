@@ -5,12 +5,14 @@ import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import EmpresaRegistrationForm from '@/components/EmpresaForm';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { CAREERS } from '@/app/data/constants';
 import Link from 'next/link';
 
 interface Empresa {
+    id?: number;
     created_at: string;
     nombreColaborador: string;
     nombreEmpresa: string;
@@ -56,6 +58,26 @@ export default function EmpresasListPage() {
         return careerIds.map(id =>
             CAREERS.find(career => career.id === id)?.name || id
         ).join(', ');
+    };
+
+    const handleDeleteEmpresa = async (id: number, nombreEmpresa: string) => {
+        try {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from('RegistroEmpresas')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            // Actualizar el estado local removiendo la empresa eliminada
+            setEmpresas(empresas.filter(empresa => empresa.id !== id));
+            
+            console.log(`Empresa ${nombreEmpresa} eliminada exitosamente`);
+        } catch (error) {
+            console.error('Error al eliminar empresa:', error);
+            alert('Error al eliminar la empresa. Inténtalo de nuevo.');
+        }
     };
 
     return (
@@ -113,6 +135,7 @@ export default function EmpresasListPage() {
                                     <TableHead>Carreras Buscadas</TableHead>
                                     <TableHead>Contacto</TableHead>
                                     <TableHead>Fecha de Registro</TableHead>
+                                    <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -151,6 +174,32 @@ export default function EmpresasListPage() {
                                         </TableCell>
                                         <TableCell>
                                             {new Date(empresa.created_at).toLocaleDateString('es-MX')}
+                                        </TableCell>
+                                        <TableCell>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive" size="sm">
+                                                        Eliminar
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Esta acción no se puede deshacer. Se eliminará permanentemente la empresa "{empresa.nombreEmpresa}" de la base de datos.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                        <AlertDialogAction 
+                                                            onClick={() => empresa.id && handleDeleteEmpresa(empresa.id, empresa.nombreEmpresa)}
+                                                            className="bg-red-600 hover:bg-red-700"
+                                                        >
+                                                            Eliminar
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         </TableCell>
                                     </TableRow>
                                 ))}
