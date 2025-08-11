@@ -17,3 +17,12 @@ export type Student = {
   campus: string;
   createdAt: Date;
 };
+export interface Empresa {
+  created_at: string;
+  nombreColaborador: string;
+  nombreEmpresa: string;
+  carreraBuscada: string;
+  logo?: string;
+  descripcion?: string;
+  correo?: string;
+}

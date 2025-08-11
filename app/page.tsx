@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import MainLayout from '@/Layouts/MainLayout';
 import Link from 'next/link';
+import EmpresasBlock from '@/components/EmpresasBlock';
 
 export default function Home() {
   const empresas = [
@@ -60,27 +61,27 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Calendar className="w-6 h-6 text-tecmilenio" />
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="w-6 h-6 text-tecmilenio" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-1">09 de Octubre</h4>
+                  <p className="text-sm text-gray-600">Feria de Empleo 2025</p>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">09 de Octubre</h4>
-                <p className="text-sm text-gray-600">Feria de Empleo 2025</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Clock className="w-6 h-6 text-tecmilenio" />
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Clock className="w-6 h-6 text-tecmilenio" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-1">3:00PM a 8:00PM</h4>
+                  <p className="text-sm text-gray-600">Horario del evento</p>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">3:00PM a 8:00PM</h4>
-                <p className="text-sm text-gray-600">Horario del evento</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="w-6 h-6 text-tecmilenio" />
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <MapPin className="w-6 h-6 text-tecmilenio" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-1">Campus San Nicolás</h4>
+                  <p className="text-sm text-gray-600">Universidad Tecmilenio</p>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">Campus San Nicolás</h4>
-                <p className="text-sm text-gray-600">Universidad Tecmilenio</p>
-              </div>
               </div>
             </div>
           </div>
@@ -96,19 +97,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
-              {empresas.map((empresa, index) => (
-                <Card key={index} className="border-0 shadow-sm hover:shadow-md transition-all duration-200 group">
-                  <CardContent className="p-6 flex items-center justify-center h-24">
-                    <img
-                      src={empresa.logo || "/placeholder.svg"}
-                      alt={`${empresa.name} logo`}
-                      className="max-h-12 max-w-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-                    />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <EmpresasBlock />
 
             <div className="text-center">
               <p className="text-gray-600 mb-4">Y muchas más empresas por confirmar</p>
