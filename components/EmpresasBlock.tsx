@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from './ui/card';
 
-export default function EmpresasBlock() {
+export default function EmpresasBlock({ limit }: { limit: number | null }) {
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -12,9 +12,11 @@ export default function EmpresasBlock() {
         const fetchEmpresas = async () => {
             try {
                 const supabase = createClient();
-                const { data, error } = await supabase
-                    .from('RegistroEmpresas')
-                    .select('*');
+                let query = supabase.from('RegistroEmpresas').select('*');
+                if (limit) {
+                    query = query.limit(limit);
+                }
+                const { data, error } = await query;
 
                 if (error) throw error;
                 if (data) setEmpresas(data);
