@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from './ui/card';
 
-export default function EmpresasBlock({ limit }: { limit: number | null }) {
+export default function EmpresasBlock({ limit }: { limit?: number}) {
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
