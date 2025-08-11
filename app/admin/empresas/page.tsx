@@ -10,6 +10,11 @@ import EmpresaRegistrationForm from '@/components/EmpresaForm';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { CAREERS } from '@/app/data/constants';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import CloudinaryUpload from '@/components/CloudinaryUpload';
 
 interface Empresa {
     id?: number;
@@ -27,6 +32,8 @@ export default function EmpresasListPage() {
     const [empresas, setEmpresas] = useState<Empresa[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [editingEmpresa, setEditingEmpresa] = useState<Empresa | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchEmpresas = async () => {
@@ -77,6 +84,39 @@ export default function EmpresasListPage() {
         } catch (error) {
             console.error('Error al eliminar empresa:', error);
             alert('Error al eliminar la empresa. Inténtalo de nuevo.');
+        }
+    };
+
+    const handleEditEmpresa = (empresa: Empresa) => {
+        setEditingEmpresa(empresa);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleUpdateEmpresa = async (updatedData: Partial<Empresa>) => {
+        if (!editingEmpresa?.id) return;
+
+        try {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from('RegistroEmpresas')
+                .update(updatedData)
+                .eq('id', editingEmpresa.id);
+
+            if (error) throw error;
+
+            // Actualizar el estado local
+            setEmpresas(empresas.map(empresa => 
+                empresa.id === editingEmpresa.id 
+                    ? { ...empresa, ...updatedData }
+                    : empresa
+            ));
+
+            setIsEditDialogOpen(false);
+            setEditingEmpresa(null);
+            console.log('Empresa actualizada exitosamente');
+        } catch (error) {
+            console.error('Error al actualizar empresa:', error);
+            alert('Error al actualizar la empresa. Inténtalo de nuevo.');
         }
     };
 
@@ -176,30 +216,39 @@ export default function EmpresasListPage() {
                                             {new Date(empresa.created_at).toLocaleDateString('es-MX')}
                                         </TableCell>
                                         <TableCell>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="sm">
-                                                        Eliminar
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Esta acción no se puede deshacer. Se eliminará permanentemente la empresa "{empresa.nombreEmpresa}" de la base de datos.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                                        <AlertDialogAction 
-                                                            onClick={() => empresa.id && handleDeleteEmpresa(empresa.id, empresa.nombreEmpresa)}
-                                                            className="bg-red-600 hover:bg-red-700"
-                                                        >
+                                            <div className="flex gap-2">
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm"
+                                                    onClick={() => handleEditEmpresa(empresa)}
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button variant="destructive" size="sm">
                                                             Eliminar
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Esta acción no se puede deshacer. Se eliminará permanentemente la empresa "{empresa.nombreEmpresa}" de la base de datos.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                            <AlertDialogAction 
+                                                                onClick={() => empresa.id && handleDeleteEmpresa(empresa.id, empresa.nombreEmpresa)}
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                            >
+                                                                Eliminar
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -213,6 +262,173 @@ export default function EmpresasListPage() {
                     </div>
                 )}
             </div>
+
+            {/* Modal de Edición */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Editar Empresa</DialogTitle>
+                    </DialogHeader>
+                    {editingEmpresa && (
+                        <EditEmpresaForm 
+                            empresa={editingEmpresa} 
+                            onSave={handleUpdateEmpresa}
+                            onCancel={() => setIsEditDialogOpen(false)}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
+    );
+}
+
+// Componente para editar empresa
+interface EditEmpresaFormProps {
+    empresa: Empresa;
+    onSave: (data: Partial<Empresa>) => void;
+    onCancel: () => void;
+}
+
+function EditEmpresaForm({ empresa, onSave, onCancel }: EditEmpresaFormProps) {
+    const [formData, setFormData] = useState<Partial<Empresa>>({
+        nombreEmpresa: empresa.nombreEmpresa || '',
+        nombreColaborador: empresa.nombreColaborador || '',
+        correo: empresa.correo || '',
+        telefono: empresa.telefono || '',
+        descripcion: empresa.descripcion || '',
+        carreraBuscada: empresa.carreraBuscada || '',
+        logo: empresa.logo || ''
+    });
+
+    const [selectedCareers, setSelectedCareers] = useState<string[]>(
+        empresa.carreraBuscada ? empresa.carreraBuscada.split(',') : []
+    );
+
+    const handleCareerChange = (careerId: string, checked: boolean) => {
+        let newSelectedCareers: string[];
+        if (checked) {
+            newSelectedCareers = [...selectedCareers, careerId];
+        } else {
+            newSelectedCareers = selectedCareers.filter(id => id !== careerId);
+        }
+        setSelectedCareers(newSelectedCareers);
+        setFormData(prev => ({
+            ...prev,
+            carreraBuscada: newSelectedCareers.join(',')
+        }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Validar campos obligatorios
+        if (!formData.nombreEmpresa?.trim()) {
+            alert('El nombre de la empresa es obligatorio');
+            return;
+        }
+        if (!formData.nombreColaborador?.trim()) {
+            alert('El nombre del colaborador es obligatorio');
+            return;
+        }
+        if (!formData.logo?.trim()) {
+            alert('El logo es obligatorio');
+            return;
+        }
+        if (!formData.carreraBuscada?.trim()) {
+            alert('Debe seleccionar al menos una carrera');
+            return;
+        }
+        
+        onSave(formData);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <Label htmlFor="nombreEmpresa">Nombre de la Empresa *</Label>
+                    <Input
+                        id="nombreEmpresa"
+                        value={formData.nombreEmpresa}
+                        onChange={(e) => setFormData(prev => ({ ...prev, nombreEmpresa: e.target.value }))}
+                        required
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="nombreColaborador">Nombre del Colaborador *</Label>
+                    <Input
+                        id="nombreColaborador"
+                        value={formData.nombreColaborador}
+                        onChange={(e) => setFormData(prev => ({ ...prev, nombreColaborador: e.target.value }))}
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <Label htmlFor="correo">Correo Electrónico</Label>
+                    <Input
+                        id="correo"
+                        type="email"
+                        value={formData.correo}
+                        onChange={(e) => setFormData(prev => ({ ...prev, correo: e.target.value }))}
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="telefono">Teléfono</Label>
+                    <Input
+                        id="telefono"
+                        value={formData.telefono}
+                        onChange={(e) => setFormData(prev => ({ ...prev, telefono: e.target.value }))}
+                    />
+                </div>
+            </div>
+
+            <div>
+                <Label htmlFor="logo">URL del Logo *</Label>
+                <CloudinaryUpload
+                    value={formData.logo}
+                    onChange={(url) => setFormData(prev => ({ ...prev, logo: url }))}
+                />
+            </div>
+
+            <div>
+                <Label htmlFor="descripcion">Descripción de la Empresa</Label>
+                <Textarea
+                    id="descripcion"
+                    value={formData.descripcion}
+                    onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                    rows={3}
+                />
+            </div>
+
+            <div>
+                <Label>Carreras Buscadas *</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2 max-h-40 overflow-y-auto">
+                    {CAREERS.map((career) => (
+                        <div key={career.id} className="flex items-center space-x-2">
+                            <Checkbox
+                                id={career.id}
+                                checked={selectedCareers.includes(career.id)}
+                                onCheckedChange={(checked) => handleCareerChange(career.id, checked === true)}
+                            />
+                            <Label htmlFor={career.id} className="text-sm">
+                                {career.name}
+                            </Label>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={onCancel}>
+                    Cancelar
+                </Button>
+                <Button type="submit">
+                    Guardar Cambios
+                </Button>
+            </div>
+        </form>
     );
 }

@@ -47,7 +47,7 @@ const formSchema = z.object({
   participaBolsa: z.boolean().optional(),
   traeArticulos: z.boolean().optional(),
   articulo: z.string().optional(),
-  logo: z.string().optional(),
+  logo: z.string().min(1, 'El logo es obligatorio'),
   descripcion: z.string().optional(),
   autorizacion: z.enum(['SI', 'NO'], {
     errorMap: () => ({ message: 'Debes autorizar el uso de tus datos' }),
