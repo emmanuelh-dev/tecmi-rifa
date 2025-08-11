@@ -97,7 +97,7 @@ export default function Home() {
               </p>
             </div>
 
-            <EmpresasBlock limit={6}/>
+            <EmpresasBlock limit={8}/>
 
             <div className="text-center">
               <p className="text-gray-600 mb-4">Y muchas más empresas por confirmar</p>
