@@ -37,11 +37,11 @@ export default function EmpresasBlock({ limit }: { limit: number | null }) {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-8 mb-12 group/grid">
                     {empresas.map((empresa, index) => (
                         <Card key={index} className="border-0 shadow-sm hover:shadow-md transition-all duration-300 group opacity-100 group-hover/grid:opacity-50 hover:!opacity-100">
-                            <CardContent className="p-6 flex items-center justify-center h-24">
+                            <CardContent className="p-6 flex items-center justify-center h-24 overflow-hidden">
                                 <img
                                     src={empresa.logo || "/empresa.svg"}
                                     alt={`${empresa.nombreEmpresa} logo`}
-                                    className="max-h-16 max-w-full object-contain transition-all duration-300"
+                                    className="object-cover max-w-[350px] object-center transition-all duration-300"
                                 />
                             </CardContent>
                         </Card>

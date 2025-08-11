@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Upload, X, FileImage } from 'lucide-react';
 import { useState, useRef } from 'react';
+import { Card, CardContent } from './ui/card';
 
 interface CloudinaryUploadProps {
   value?: string;
@@ -124,23 +125,33 @@ export default function CloudinaryUpload({
       </div>
 
       {showSuccess && (
-         <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-           <div className="text-green-700 text-sm flex items-center gap-2">
-             <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-             ¡Imagen cargada exitosamente!
-           </div>
-         </div>
-       )}
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="text-green-700 text-sm flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+            ¡Imagen cargada exitosamente!
+          </div>
+        </div>
+      )}
 
       {imageError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <div className="text-red-700 text-sm flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-              {errorMessage}
-            </div>
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="text-red-700 text-sm flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+            {errorMessage}
           </div>
-        )}
+        </div>
+      )}
+      {value &&
 
+        <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 group opacity-100 group-hover/grid:opacity-50 hover:!opacity-100">
+          <CardContent className="p-6 flex items-center justify-center h-24 overflow-hidden">
+            <img
+              src={value}
+              className="object-cover max-w-[350px] object-center transition-all duration-300"
+            />
+          </CardContent>
+        </Card>
+      }
       {/* Vista previa de la imagen */}
       {value && (
         <div className="mt-4 space-y-3">
@@ -181,7 +192,7 @@ export default function CloudinaryUpload({
               </Button>
             )}
           </div>
-          
+
           <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
             Archivo cargado correctamente
           </div>
