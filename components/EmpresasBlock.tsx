@@ -41,7 +41,7 @@ export default function EmpresasBlock({ limit }: { limit?: number}) {
                                 <img
                                     src={empresa.logo || "/empresa.svg"}
                                     alt={`${empresa.nombreEmpresa} logo`}
-                                    className="object-cover max-w-[160px] xl:max-w-[350px] object-center transition-all duration-300"
+                                    className="object-cover max-w-full object-center transition-all duration-300"
                                 />
                             </CardContent>
                         </Card>
