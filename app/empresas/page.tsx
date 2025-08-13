@@ -36,7 +36,7 @@ export default function EmpresasPage() {
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center max-w-4xl mx-auto">
                         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                            Feria del Empleo <span className="text-tecmilenio block">Empresas Participantes</span>
+                            Feria del Empleo <span className="text-tecmilenio block">+{empresas.length} Empresas Participantes</span>
                         </h1>
                     </div>
                 </div>
