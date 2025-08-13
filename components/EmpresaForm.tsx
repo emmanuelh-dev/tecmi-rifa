@@ -204,7 +204,12 @@ export default function EmpresaRegistrationForm() {
     <div className="space-y-4">
       {isEditing && (
         <div className="text-center space-y-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-600">Estás editando un registro existente</p>
+
+          <p className="text-sm text-green-600">
+            <br />
+            Puedes volver a este enlace en cualquier momento para editar o actualizar tu información. Próximamente, Iván Ilich, Coordinador de Tecmilenio, se pondrá en contacto contigo.
+          </p>
+
           <Button
             variant="outline"
             size="sm"
@@ -479,7 +484,7 @@ export default function EmpresaRegistrationForm() {
                           descripcion: 'Freelance - Trabajo independiente'
                         }
                       };
-                      
+
                       const selectedOption = opcionesVacante[value as keyof typeof opcionesVacante];
                       if (selectedOption && !field.value.some((item: any) => item.tipo === selectedOption.tipo)) {
                         field.onChange([...field.value, selectedOption]);
@@ -499,7 +504,7 @@ export default function EmpresaRegistrationForm() {
                     </SelectContent>
                   </Select>
                 </FormControl>
-                
+
                 {/* Mostrar opciones seleccionadas */}
                 <div className="mt-2 space-y-2">
                   {field.value.map((vacante: any, index: number) => (
@@ -525,13 +530,13 @@ export default function EmpresaRegistrationForm() {
                     </div>
                   ))}
                 </div>
-                
+
                 {field.value.length === 0 && (
                   <p className="text-sm text-muted-foreground mt-1">
                     Selecciona al menos un tipo de vacante
                   </p>
                 )}
-                
+
                 <FormMessage />
               </FormItem>
             )}
