@@ -222,10 +222,21 @@ export default function EmpresasListPage() {
                       {new Date(empresa.created_at).toLocaleDateString('es-MX')}
                     </TableCell>
                     <TableCell>
-                      {empresa.requiereStand ? <div className='text-center rounded-full bg-green-500 text-white px-2 py-1'>Sí</div> : 'No'}
+                      <div
+                        className={`text-center rounded-full px-2 py-1 text-white ${empresa.requiereStand ? 'bg-green-500' : 'bg-red-500'
+                          }`}
+                      >
+                        {empresa.requiereStand ? 'Sí' : 'No'}
+                      </div>
                     </TableCell>
+
                     <TableCell>
-                      {empresa.luz ? <div className='text-center rounded-full bg-green-500 text-white px-2 py-1'>Sí</div> : 'No'}
+                      <div
+                        className={`text-center rounded-full px-2 py-1 text-white ${empresa.luz ? 'bg-green-500' : 'bg-red-500'
+                          }`}
+                      >
+                        {empresa.luz ? 'Sí' : 'No'}
+                      </div>
                     </TableCell>
 
                     <TableCell>
