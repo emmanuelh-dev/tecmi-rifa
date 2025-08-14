@@ -55,6 +55,7 @@ const formSchema = z.object({
   llevaPersonasExtras: z.boolean().optional(),
   cantidadPersonasExtras: z.number().optional(),
   nombresPersonasExtras: z.array(z.string()).optional(),
+  luz: z.boolean().optional().default(false),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -206,6 +207,7 @@ export default function EmpresaRegistrationForm() {
         <div className="text-center space-y-2 p-4 bg-green-50 border border-green-200 rounded-lg">
 
           <p className="text-sm text-green-600">
+            <span className='block font-bold'>Formulario Guardado exitosamente. Puedes continuar editando.</span>
             <br />
             Puedes volver a este enlace en cualquier momento para editar o actualizar tu información. Próximamente, Iván Ilich, Coordinador de Tecmilenio, se pondrá en contacto contigo.
           </p>
@@ -621,6 +623,24 @@ export default function EmpresaRegistrationForm() {
                     <option value="SI">✅ Sí, traeremos nuestro stand</option>
                     <option value="NO">❌ No, requerimos el mobiliario que proporcionan</option>
                   </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="luz"
+            render={({ field }) => (
+              <FormItem className='flex items-center gap-4'>
+                <FormLabel className='block w-full'>¿Va a requerir conexión eléctrica?</FormLabel>
+                <FormControl>
+                  <Input
+                    type="checkbox"
+                    checked={field.value ?? false}
+                    onChange={e => field.onChange(e.target.checked)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
