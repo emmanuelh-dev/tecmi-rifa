@@ -222,11 +222,12 @@ export default function EmpresasListPage() {
                       {new Date(empresa.created_at).toLocaleDateString('es-MX')}
                     </TableCell>
                     <TableCell>
-                      {empresa.requiereStand ? 'Sí' : 'No'}
+                      {empresa.requiereStand ? <div className='text-center rounded-full bg-green-500 text-white px-2 py-1'>Sí</div> : 'No'}
                     </TableCell>
                     <TableCell>
-                      {empresa.luz ? 'Sí' : 'No'}
+                      {empresa.luz ? <div className='text-center rounded-full bg-green-500 text-white px-2 py-1'>Sí</div> : 'No'}
                     </TableCell>
+
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
