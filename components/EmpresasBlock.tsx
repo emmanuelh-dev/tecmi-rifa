@@ -149,7 +149,7 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
                     </div>
                   </div>
 
-                  {empresa.correo && (
+                  {/* {empresa.correo && (
                     <div className="border-t pt-4">
                       <div className="flex gap-3">
                         <button
@@ -161,7 +161,7 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
                         </button>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </DialogContent>
             </Dialog>
