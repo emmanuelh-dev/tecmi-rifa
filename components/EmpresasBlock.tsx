@@ -133,12 +133,16 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
                         <div>
                           <p className="text-sm font-medium text-gray-900">Carrera Buscada</p>
 
-                          <p className="text-sm text-gray-600">
+                          <ul className="text-sm text-gray-600">
                             {empresa.carreraBuscada.split(',').map(carreraId => {
                               const carrera = CAREERS.find(c => c.id === carreraId.trim());
                               return carrera ? carrera.name : carreraId;
-                            }).join(', ')}
-                          </p>
+                            }).map(carreraName => (
+                              <li key={carreraName} className="text-sm text-gray-600 list-disc ml-4">
+                                {carreraName}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
 
