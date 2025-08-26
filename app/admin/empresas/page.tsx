@@ -19,16 +19,30 @@ import CloudinaryUpload from '@/components/CloudinaryUpload';
 interface Empresa {
   id?: number;
   created_at: string;
-  nombreColaborador: string;
   nombreEmpresa: string;
-  carreraBuscada: string;
-  logo?: string;
-  descripcion?: string;
+  ubicacion?: string;
+  nombreColaborador: string;
+  cargo?: string;
   correo?: string;
   telefono?: string;
+  llevaAcompanante?: boolean;
+  nombreAcompañante?: string;
+  correo2?: string;
+  telefono2?: string;
+  personasExtras?: string;
+  nivelVacante?: string;
+  carreraBuscada: string;
   requiereStand?: boolean;
+  participaBolsa?: boolean;
+  traeArticulos?: boolean;
+  articulo?: string;
+  logo?: string;
+  descripcion?: string;
+  autorizacion?: string;
+  llevaPersonasExtras?: boolean;
+  cantidadPersonasExtras?: number;
+  nombresPersonasExtras?: string;
   luz?: boolean;
-
 }
 
 export default function EmpresasListPage() {
@@ -124,7 +138,7 @@ export default function EmpresasListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-tecmilenio py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className='flex justify-between items-center mb-8'>
           <div>
@@ -134,13 +148,13 @@ export default function EmpresasListPage() {
             </p>
           </div>
           <Link href="/empresa-registro">
-            <Button className="bg-white text-custom-green hover:bg-gray-100">
+            <Button className="bg-white text-tecmilenio hover:bg-gray-100">
               Página de Registro de Empresas
             </Button>
           </Link>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-white text-custom-green hover:bg-gray-100">
+              <Button variant="outline" className="bg-white text-tecmilenio hover:bg-gray-100">
                 Ver Formulario de Empresa
               </Button>
             </DialogTrigger>
@@ -174,13 +188,19 @@ export default function EmpresasListPage() {
                 <TableRow>
                   <TableHead>Logo</TableHead>
                   <TableHead>Empresa</TableHead>
+                  <TableHead>Ubicación</TableHead>
                   <TableHead>Colaborador</TableHead>
-                  <TableHead>Carreras Buscadas</TableHead>
+                  <TableHead>Cargo</TableHead>
                   <TableHead>Contacto</TableHead>
-                  <TableHead>Fecha de Registro</TableHead>
-                  <TableHead>Requiere Stand</TableHead>
-                  <TableHead>Requiere conexión eléctrica</TableHead>
-
+                  <TableHead>Acompañante</TableHead>
+                  <TableHead>Nivel Vacante</TableHead>
+                  <TableHead>Carreras Buscadas</TableHead>
+                  <TableHead>Stand</TableHead>
+                  <TableHead>Bolsa Trabajo</TableHead>
+                  <TableHead>Trae Artículos</TableHead>
+                  <TableHead>Personas Extras</TableHead>
+                  <TableHead>Autorización</TableHead>
+                  <TableHead>Fecha Registro</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -210,8 +230,9 @@ export default function EmpresasListPage() {
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">{empresa.nombreEmpresa}</TableCell>
+                    <TableCell>{empresa.ubicacion || 'N/A'}</TableCell>
                     <TableCell>{empresa.nombreColaborador}</TableCell>
-                    <TableCell>{getCareerNames(empresa.carreraBuscada)}</TableCell>
+                    <TableCell>{empresa.cargo || 'N/A'}</TableCell>
                     <TableCell>
                       <div className="text-sm">
                         {empresa.correo && <div>{empresa.correo}</div>}
@@ -219,24 +240,65 @@ export default function EmpresasListPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {new Date(empresa.created_at).toLocaleDateString('es-MX')}
+                      <div className="text-sm">
+                        {empresa.llevaAcompanante ? (
+                          <>
+                            <div className="font-medium">{empresa.nombreAcompañante}</div>
+                            {empresa.correo2 && <div>{empresa.correo2}</div>}
+                            {empresa.telefono2 && <div>{empresa.telefono2}</div>}
+                          </>
+                        ) : (
+                          <span className="text-gray-500">No</span>
+                        )}
+                      </div>
                     </TableCell>
+                    <TableCell>{empresa.nivelVacante || 'N/A'}</TableCell>
+                    <TableCell className="max-w-xs truncate">{empresa.carreraBuscada}</TableCell>
                     <TableCell>
-                      <div
-                        className={`text-center rounded-full px-2 py-1 text-white ${empresa.requiereStand ? 'bg-green-500' : 'bg-red-500'
-                          }`}
-                      >
+                      <div className={`text-center rounded-full px-2 py-1 text-white text-xs ${empresa.requiereStand ? 'bg-green-500' : 'bg-red-500'}`}>
                         {empresa.requiereStand ? 'Sí' : 'No'}
                       </div>
                     </TableCell>
-
                     <TableCell>
-                      <div
-                        className={`text-center rounded-full px-2 py-1 text-white ${empresa.luz ? 'bg-green-500' : 'bg-red-500'
-                          }`}
-                      >
-                        {empresa.luz ? 'Sí' : 'No'}
+                      <div className={`text-center rounded-full px-2 py-1 text-white text-xs ${empresa.participaBolsa ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {empresa.participaBolsa ? 'Sí' : 'No'}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {empresa.traeArticulos ? (
+                          <>
+                            <div className="text-green-600 font-medium">Sí</div>
+                            {empresa.articulo && <div className="text-xs text-gray-500">{empresa.articulo}</div>}
+                          </>
+                        ) : (
+                          <span className="text-red-600">No</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {empresa.llevaPersonasExtras ? (
+                          <>
+                            <div className="text-green-600 font-medium">Sí ({empresa.cantidadPersonasExtras})</div>
+                            {empresa.nombresPersonasExtras && (
+                              <div className="text-xs text-gray-500 max-w-xs truncate">
+                                {empresa.nombresPersonasExtras}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-red-600">No</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className={`text-center rounded-full px-2 py-1 text-white text-xs ${empresa.autorizacion === 'SI' ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {empresa.autorizacion || 'NO'}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(empresa.created_at).toLocaleDateString('es-MX')}
                     </TableCell>
 
                     <TableCell>
@@ -316,12 +378,28 @@ interface EditEmpresaFormProps {
 function EditEmpresaForm({ empresa, onSave, onCancel }: EditEmpresaFormProps) {
   const [formData, setFormData] = useState<Partial<Empresa>>({
     nombreEmpresa: empresa.nombreEmpresa || '',
+    ubicacion: empresa.ubicacion || '',
     nombreColaborador: empresa.nombreColaborador || '',
+    cargo: empresa.cargo || '',
     correo: empresa.correo || '',
     telefono: empresa.telefono || '',
+    llevaAcompanante: empresa.llevaAcompanante || false,
+    nombreAcompañante: empresa.nombreAcompañante || '',
+    correo2: empresa.correo2 || '',
+    telefono2: empresa.telefono2 || '',
+    nivelVacante: empresa.nivelVacante || '',
     descripcion: empresa.descripcion || '',
     carreraBuscada: empresa.carreraBuscada || '',
-    logo: empresa.logo || ''
+    requiereStand: empresa.requiereStand || false,
+    participaBolsa: empresa.participaBolsa || false,
+    traeArticulos: empresa.traeArticulos || false,
+    articulo: empresa.articulo || '',
+    logo: empresa.logo || '',
+    autorizacion: empresa.autorizacion || 'NO',
+    llevaPersonasExtras: empresa.llevaPersonasExtras || false,
+    cantidadPersonasExtras: empresa.cantidadPersonasExtras || 0,
+    nombresPersonasExtras: empresa.nombresPersonasExtras || '',
+    luz: empresa.luz || false
   });
 
   const [selectedCareers, setSelectedCareers] = useState<string[]>(
@@ -379,12 +457,31 @@ function EditEmpresaForm({ empresa, onSave, onCancel }: EditEmpresaFormProps) {
           />
         </div>
         <div>
+          <Label htmlFor="ubicacion">Ubicación</Label>
+          <Input
+            id="ubicacion"
+            value={formData.ubicacion}
+            onChange={(e) => setFormData(prev => ({ ...prev, ubicacion: e.target.value }))}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
           <Label htmlFor="nombreColaborador">Nombre del Colaborador *</Label>
           <Input
             id="nombreColaborador"
             value={formData.nombreColaborador}
             onChange={(e) => setFormData(prev => ({ ...prev, nombreColaborador: e.target.value }))}
             required
+          />
+        </div>
+        <div>
+          <Label htmlFor="cargo">Cargo</Label>
+          <Input
+            id="cargo"
+            value={formData.cargo}
+            onChange={(e) => setFormData(prev => ({ ...prev, cargo: e.target.value }))}
           />
         </div>
       </div>
@@ -407,6 +504,57 @@ function EditEmpresaForm({ empresa, onSave, onCancel }: EditEmpresaFormProps) {
             onChange={(e) => setFormData(prev => ({ ...prev, telefono: e.target.value }))}
           />
         </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="llevaAcompanante"
+            checked={formData.llevaAcompanante}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, llevaAcompanante: checked === true }))}
+          />
+          <Label htmlFor="llevaAcompanante">Lleva Acompañante</Label>
+        </div>
+
+        {formData.llevaAcompanante && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ml-6">
+            <div>
+              <Label htmlFor="nombreAcompañante">Nombre del Acompañante</Label>
+              <Input
+                id="nombreAcompañante"
+                value={formData.nombreAcompañante}
+                onChange={(e) => setFormData(prev => ({ ...prev, nombreAcompañante: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="correo2">Correo del Acompañante</Label>
+              <Input
+                id="correo2"
+                type="email"
+                value={formData.correo2}
+                onChange={(e) => setFormData(prev => ({ ...prev, correo2: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="telefono2">Teléfono del Acompañante</Label>
+              <Input
+                id="telefono2"
+                value={formData.telefono2}
+                onChange={(e) => setFormData(prev => ({ ...prev, telefono2: e.target.value }))}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="nivelVacante">Nivel de Vacante</Label>
+        <Input
+          id="nivelVacante"
+          value={formData.nivelVacante}
+          onChange={(e) => setFormData(prev => ({ ...prev, nivelVacante: e.target.value }))}
+          placeholder="Ej: Junior, Senior, Practicante"
+        />
       </div>
 
       <div>
@@ -443,6 +591,108 @@ function EditEmpresaForm({ empresa, onSave, onCancel }: EditEmpresaFormProps) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="requiereStand"
+            checked={formData.requiereStand}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, requiereStand: checked === true }))}
+          />
+          <Label htmlFor="requiereStand">Requiere Stand</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="participaBolsa"
+            checked={formData.participaBolsa}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, participaBolsa: checked === true }))}
+          />
+          <Label htmlFor="participaBolsa">Participa en Bolsa de Trabajo</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="luz"
+            checked={formData.luz}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, luz: checked === true }))}
+          />
+          <Label htmlFor="luz">Requiere Conexión Eléctrica</Label>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="traeArticulos"
+            checked={formData.traeArticulos}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, traeArticulos: checked === true }))}
+          />
+          <Label htmlFor="traeArticulos">Trae Artículos</Label>
+        </div>
+
+        {formData.traeArticulos && (
+          <div className="ml-6">
+            <Label htmlFor="articulo">Descripción del Artículo</Label>
+            <Input
+              id="articulo"
+              value={formData.articulo}
+              onChange={(e) => setFormData(prev => ({ ...prev, articulo: e.target.value }))}
+              placeholder="Describe el artículo que traerá"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="llevaPersonasExtras"
+            checked={formData.llevaPersonasExtras}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, llevaPersonasExtras: checked === true }))}
+          />
+          <Label htmlFor="llevaPersonasExtras">Lleva Personas Extras</Label>
+        </div>
+
+        {formData.llevaPersonasExtras && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6">
+            <div>
+              <Label htmlFor="cantidadPersonasExtras">Cantidad de Personas Extras</Label>
+              <Input
+                id="cantidadPersonasExtras"
+                type="number"
+                min="0"
+                value={formData.cantidadPersonasExtras}
+                onChange={(e) => setFormData(prev => ({ ...prev, cantidadPersonasExtras: parseInt(e.target.value) || 0 }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="nombresPersonasExtras">Nombres de Personas Extras</Label>
+              <Textarea
+                id="nombresPersonasExtras"
+                value={formData.nombresPersonasExtras}
+                onChange={(e) => setFormData(prev => ({ ...prev, nombresPersonasExtras: e.target.value }))}
+                placeholder="Lista los nombres separados por comas"
+                rows={2}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="autorizacion">Autorización</Label>
+        <Select
+          value={formData.autorizacion}
+          onValueChange={(value) => setFormData(prev => ({ ...prev, autorizacion: value }))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona autorización" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="SI">SÍ</SelectItem>
+            <SelectItem value="NO">NO</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

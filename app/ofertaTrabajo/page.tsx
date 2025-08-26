@@ -46,7 +46,7 @@ export default function OfertaEmpleo() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-custom-green text-white">
+    <div className="min-h-screen flex flex-col bg-tecmilenio text-white">
       <div className="flex-grow">
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">

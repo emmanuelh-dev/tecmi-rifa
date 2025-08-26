@@ -72,7 +72,7 @@ export default function Home() {
                   <div className="w-12 h-12 bg-tecmilenio-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                     <Clock className="w-6 h-6 text-tecmilenio" />
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-1">3:00PM a 8:00PM</h4>
+                  <h4 className="font-semibold text-gray-900 mb-1">4:00PM a 8:00PM</h4>
                   <p className="text-sm text-gray-600">Horario del evento</p>
                 </div>
                 <div className="text-center">
@@ -97,7 +97,7 @@ export default function Home() {
               </p>
             </div>
 
-            <EmpresasBlock limit={8}/>
+            <EmpresasBlock limit={8} />
 
             <div className="text-center">
               <p className="text-gray-600 mb-4">Y muchas más empresas por confirmar</p>

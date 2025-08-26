@@ -278,7 +278,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-tecmilenio py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Encabezado con título y botón de Registro de Empresas */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">

@@ -126,7 +126,7 @@ export default function WinnerPage() {
     };
 
     return (
-        <div className="min-h-screen bg-custom-green py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-tecmilenio py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
