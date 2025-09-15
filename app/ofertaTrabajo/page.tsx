@@ -1,11 +1,11 @@
 'use client'
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
 // Crear cliente de Supabase
-const supabase = createClient(
+const supabase = supabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );

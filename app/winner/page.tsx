@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift } from 'lucide-react';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -32,7 +32,7 @@ export default function WinnerPage() {
         const fetchStudents = async () => {
             try {
                 setIsLoading(true);
-                const supabase = createClient();
+                const supabase = supabaseClient();
 
                 const { data, error } = await supabase
                     .from('RegistroTecmi')

@@ -1,6 +1,6 @@
 'use client'
 import { Empresa } from '@/app/types';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
@@ -15,7 +15,7 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const supabase = createClient();
+        const supabase = supabaseClient();
         let query = supabase.from('RegistroEmpresas').select('*');
         if (limit) {
           query = query.limit(limit);

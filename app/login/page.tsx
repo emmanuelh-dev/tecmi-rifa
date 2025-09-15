@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { createClient } from "@/lib/supabase/client"
+import { supabaseClient } from "@/lib/supabase/client"
 import { Building2, Mail, Lock, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import MainLayout from "@/Layouts/MainLayout"
@@ -23,7 +23,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const supabase = createClient()
+      const supabase = supabaseClient()
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

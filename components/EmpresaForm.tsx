@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import CloudinaryUpload from '@/components/CloudinaryUpload';
 
 const formSchema = z.object({
@@ -64,7 +64,7 @@ export default function EmpresaRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [empresaId, setEmpresaId] = useState<string | null>(null);
-  const supabase = createClient();
+  const supabase = supabaseClient();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -55,7 +55,7 @@ export default function EmpresasListPage() {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const supabase = createClient();
+        const supabase = supabaseClient();
         const { data, error } = await supabase
           .from('RegistroEmpresas')
           .select('*');
@@ -86,7 +86,7 @@ export default function EmpresasListPage() {
 
   const handleDeleteEmpresa = async (id: number, nombreEmpresa: string) => {
     try {
-      const supabase = createClient();
+      const supabase = supabaseClient();
       const { error } = await supabase
         .from('RegistroEmpresas')
         .delete()
@@ -113,7 +113,7 @@ export default function EmpresasListPage() {
     if (!editingEmpresa?.id) return;
 
     try {
-      const supabase = createClient();
+      const supabase = supabaseClient();
       const { error } = await supabase
         .from('RegistroEmpresas')
         .update(updatedData)

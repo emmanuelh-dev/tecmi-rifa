@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import MainLayout from '@/Layouts/MainLayout';
 import { Empresa } from '../types';
@@ -14,7 +14,7 @@ export default function EmpresasPage() {
     useEffect(() => {
         const fetchEmpresas = async () => {
             try {
-                const supabase = createClient();
+                const supabase = supabaseClient();
                 const { data, error } = await supabase
                     .from('RegistroEmpresas')
                     .select('*');

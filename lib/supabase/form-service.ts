@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import { FormConfig, FormResponse } from '@/types/form-builder';
 
 export interface DatabaseFormConfig {
@@ -26,7 +26,7 @@ export interface DatabaseFormResponse {
 }
 
 export class FormService {
-  private supabase = createClient();
+  private supabase = supabaseClient();
 
   // Convertir de formato de base de datos a formato de aplicación
   private dbToAppConfig(dbConfig: DatabaseFormConfig): FormConfig {

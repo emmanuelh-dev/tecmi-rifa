@@ -54,8 +54,8 @@ async function testShareFunctionality() {
 async function checkDatabase() {
   console.log('=== Verificando estructura de base de datos ===');
   
-  const { createClient } = await import('./lib/supabase/client.ts');
-  const supabase = createClient();
+  const { supabaseClient } = await import('./lib/supabase/client.ts');
+  const supabase = supabaseClient();
   
   try {
     // Verificar tabla form_configs

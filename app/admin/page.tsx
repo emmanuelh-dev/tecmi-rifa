@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Users, PieChart } from 'lucide-react';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/client';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart as ReChartPie, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CAREERS, CAMPUSES } from '@/app/data/constants';
@@ -45,7 +45,7 @@ export default function AdminPage() {
   const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
 
-    const supabase = createClient();
+    const supabase = supabaseClient();
     const { type, id } = itemToDelete;
 
     try {
@@ -87,7 +87,7 @@ export default function AdminPage() {
   };
 
   const handleUpdate = async (type: 'student' | 'empresa', updatedData: any) => {
-    const supabase = createClient();
+    const supabase = supabaseClient();
     try {
       const { error } = await supabase
         .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
@@ -134,7 +134,7 @@ export default function AdminPage() {
     const fetchStudents = async () => {
       try {
         setIsLoading(true);
-        const supabase = createClient();
+        const supabase = supabaseClient();
 
         const { data, error } = await supabase
           .from('RegistroTecmi')
@@ -166,7 +166,7 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const supabase = createClient();
+        const supabase = supabaseClient();
         console.log('Iniciando consulta a Supabase...'); // Depuración
 
         const { data, error } = await supabase
