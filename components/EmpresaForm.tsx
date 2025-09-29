@@ -64,7 +64,6 @@ export default function EmpresaRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [empresaId, setEmpresaId] = useState<string | null>(null);
-  const supabase = supabaseClient();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -152,7 +151,7 @@ export default function EmpresaRegistrationForm() {
       console.log('🖼️ Logo in dataToSave:', dataToSave.logo);
 
       if (isEditing && empresaId) {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('RegistroEmpresas')
           .update(dataToSave)
           .eq('id', empresaId);
@@ -162,7 +161,7 @@ export default function EmpresaRegistrationForm() {
         localStorage.setItem('empresa-registro-data', JSON.stringify(values));
         toast.success('¡Registro actualizado exitosamente!');
       } else {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('RegistroEmpresas')
           .insert([dataToSave])
           .select('id')

@@ -23,14 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { supabaseClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { supabaseClient } from '@/lib/supabase/client';
 
-// Crear cliente de Supabase
-const supabase = supabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 //AQUI ERA EL ERRO DE LAS VALIDACIO----------------------------------------------------------------------------------------------------
 const formSchema = z.object({
   userType: z.enum(['student', 'alumni'], {
@@ -95,13 +90,12 @@ export default function RegistrationForm() {
       email: '',
     },
   });
-
   // Función para manejar el envío del formulario
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
       // Inserta los datos en Supabase
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('RegistroTecmi')
         .insert([
           {
