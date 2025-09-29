@@ -55,11 +55,10 @@ async function checkDatabase() {
   console.log('=== Verificando estructura de base de datos ===');
   
   const { supabaseClient } = await import('./lib/supabase/client.ts');
-  const supabase = supabaseClient();
   
   try {
     // Verificar tabla form_configs
-    const { data: tableInfo, error: tableError } = await supabase
+    const { data: tableInfo, error: tableError } = await supabaseClient
       .from('form_configs')
       .select('id, title, share_token, is_public')
       .limit(1);

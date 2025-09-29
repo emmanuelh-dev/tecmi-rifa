@@ -45,11 +45,10 @@ export default function AdminPage() {
   const handleDeleteConfirm = async () => {
     if (!itemToDelete) return;
 
-    const supabase = supabaseClient();
     const { type, id } = itemToDelete;
 
     try {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
         .delete()
         .eq('id', id);
@@ -60,13 +59,13 @@ export default function AdminPage() {
 
       // Refresh data
       if (type === 'student') {
-        const { data } = await supabase.from('RegistroTecmi').select('*');
+        const { data } = await supabaseClient.from('RegistroTecmi').select('*');
         if (data) {
           setStudents(data as Student[]);
           processChartData(data as Student[]);
         }
       } else {
-        const { data } = await supabase.from('RegistroEmpresas').select('*');
+        const { data } = await supabaseClient.from('RegistroEmpresas').select('*');
         if (data) setEmpresas(data as Empresa[]);
       }
     } catch (err) {
@@ -87,9 +86,8 @@ export default function AdminPage() {
   };
 
   const handleUpdate = async (type: 'student' | 'empresa', updatedData: any) => {
-    const supabase = supabaseClient();
     try {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
         .update(updatedData)
         .eq('id', updatedData.id);
@@ -100,14 +98,14 @@ export default function AdminPage() {
 
       // Refresh data
       if (type === 'student') {
-        const { data } = await supabase.from('RegistroTecmi').select('*');
+        const { data } = await supabaseClient.from('RegistroTecmi').select('*');
         if (data) {
           setStudents(data as Student[]);
           processChartData(data as Student[]);
         }
         setSelectedStudentToEdit(null);
       } else {
-        const { data } = await supabase.from('RegistroEmpresas').select('*');
+        const { data } = await supabaseClient.from('RegistroEmpresas').select('*');
         if (data) setEmpresas(data as Empresa[]);
         setSelectedEmpresaToEdit(null);
       }
@@ -134,9 +132,8 @@ export default function AdminPage() {
     const fetchStudents = async () => {
       try {
         setIsLoading(true);
-        const supabase = supabaseClient();
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('RegistroTecmi')
           .select('*');
 
@@ -166,10 +163,9 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const supabase = supabaseClient();
         console.log('Iniciando consulta a Supabase...'); // Depuración
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('RegistroEmpresas') // Nombre de la tabla en Supabase
           .select('*');
 

@@ -32,9 +32,8 @@ export default function WinnerPage() {
         const fetchStudents = async () => {
             try {
                 setIsLoading(true);
-                const supabase = supabaseClient();
 
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('RegistroTecmi')
                     .select('*');
 

@@ -26,7 +26,6 @@ export interface DatabaseFormResponse {
 }
 
 export class FormService {
-  private supabase = supabaseClient();
 
   // Convertir de formato de base de datos a formato de aplicación
   private dbToAppConfig(dbConfig: DatabaseFormConfig): FormConfig {
@@ -54,7 +53,7 @@ export class FormService {
 
   // Obtener todos los formularios del usuario actual
   async getUserForms(): Promise<FormConfig[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_configs')
       .select('*')
       .order('updated_at', { ascending: false });
@@ -66,7 +65,7 @@ export class FormService {
   // Obtener un formulario por ID
   async getForm(id: string): Promise<FormConfig | null> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await supabaseClient
         .from('form_configs')
         .select('*')
         .eq('id', id)
@@ -87,7 +86,7 @@ export class FormService {
 
   // Obtener un formulario público por token de compartir
   async getPublicFormByToken(token: string): Promise<FormConfig | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_configs')
       .select('*')
       .eq('share_token', token)
@@ -108,7 +107,7 @@ export class FormService {
     try {
       console.log('Buscando formulario público con ID:', formId);
       
-      const { data, error } = await this.supabase
+      const { data, error } = await supabaseClient
         .from('form_configs')
         .select('*')
         .eq('id', formId)
@@ -136,7 +135,7 @@ export class FormService {
   async createForm(config: FormConfig): Promise<FormConfig> {
     const dbConfig = this.appToDbConfig(config);
     
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_configs')
       .insert(dbConfig)
       .select()
@@ -150,7 +149,7 @@ export class FormService {
   async updateForm(id: string, config: FormConfig): Promise<FormConfig> {
     const dbConfig = this.appToDbConfig(config);
     
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_configs')
       .update(dbConfig)
       .eq('id', id)
@@ -163,7 +162,7 @@ export class FormService {
 
   // Eliminar un formulario
   async deleteForm(id: string): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await supabaseClient
       .from('form_configs')
       .delete()
       .eq('id', id);
@@ -175,11 +174,11 @@ export class FormService {
   async generateShareToken(formId: string): Promise<string> {
     console.log('Haciendo público el formulario ID:', formId);
     
-    const { error } = await this.supabase
+    const { error } = await supabaseClient
       .from('form_configs')
       .update({ is_public: true })
       .eq('id', formId)
-      .eq('created_by', (await this.supabase.auth.getUser()).data.user?.id);
+      .eq('created_by', (await supabaseClient.auth.getUser()).data.user?.id);
 
     if (error) {
       console.error('Error haciendo público el formulario:', error);
@@ -194,7 +193,7 @@ export class FormService {
 
   // Desactivar compartir (quitar token)
   async disableSharing(formId: string): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await supabaseClient
       .from('form_configs')
       .update({ is_public: false, share_token: null })
       .eq('id', formId);
@@ -204,7 +203,7 @@ export class FormService {
 
   // Enviar respuesta a un formulario
   async submitResponse(formId: string, responses: Record<string, any>): Promise<void> {
-    const { error } = await this.supabase
+    const { error } = await supabaseClient
       .from('form_responses')
       .insert({
         form_config_id: formId,
@@ -217,7 +216,7 @@ export class FormService {
 
   // Obtener respuestas de un formulario
   async getFormResponses(formId: string): Promise<DatabaseFormResponse[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_responses')
       .select('*')
       .eq('form_config_id', formId)
@@ -229,7 +228,7 @@ export class FormService {
 
   // Obtener estadísticas de un formulario
   async getFormStats(formId: string) {
-    const { data, error } = await this.supabase
+    const { data, error } = await supabaseClient
       .from('form_stats')
       .select('*')
       .eq('id', formId)

@@ -55,8 +55,7 @@ export default function EmpresasListPage() {
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
-        const supabase = supabaseClient();
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('RegistroEmpresas')
           .select('*');
 
@@ -86,8 +85,7 @@ export default function EmpresasListPage() {
 
   const handleDeleteEmpresa = async (id: number, nombreEmpresa: string) => {
     try {
-      const supabase = supabaseClient();
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('RegistroEmpresas')
         .delete()
         .eq('id', id);
@@ -113,8 +111,7 @@ export default function EmpresasListPage() {
     if (!editingEmpresa?.id) return;
 
     try {
-      const supabase = supabaseClient();
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('RegistroEmpresas')
         .update(updatedData)
         .eq('id', editingEmpresa.id);
