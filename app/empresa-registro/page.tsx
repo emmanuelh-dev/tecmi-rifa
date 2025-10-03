@@ -12,7 +12,7 @@ export default function EmpresaRegistroPage() {
     <MainLayout>
       <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-tecmilenio/5 via-transparent to-tecmilenio/10 pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto relative">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-tecmilenio/10 rounded-full mb-6 animate-pulse">
@@ -40,11 +40,24 @@ export default function EmpresaRegistroPage() {
                 </Link>
               </>
             ) : (
-              <div className="inline-flex items-center gap-3 px-6 py-4 bg-amber-50 border border-amber-200 rounded-xl">
-                <Clock className="w-5 h-5 text-amber-600" />
-                <p className="text-lg text-amber-900 font-medium">
-                  El registro ya cerró. Espera la próxima convocatoria.
-                </p>
+              <div className="max-w-xl mx-auto px-8 py-6 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-lg">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-lg text-gray-900 font-semibold mb-2">
+                      El registro para esta edición ya ha cerrado.
+                    </p>
+                    <p className="text-base text-gray-700 mb-1">
+                      ¡Nos vemos en la próxima Feria de Empleo del semestre{' '}
+                      <span className="font-bold text-tecmilenio">Enero–Mayo 2026!</span>
+                    </p>
+                    <p className="text-base text-gray-600">
+                      Esperamos contar contigo
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
