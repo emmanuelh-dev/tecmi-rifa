@@ -18,6 +18,7 @@ export type Student = {
   createdAt: Date;
 };
 export interface Empresa {
+  id: string;
   created_at: string;
   nombreColaborador: string;
   nombreEmpresa: string;
