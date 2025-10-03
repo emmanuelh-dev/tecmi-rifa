@@ -11,7 +11,7 @@ export default function EmpresaRegistroPage() {
   return (
     <MainLayout>
       <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-tecmilenio/5 via-transparent to-tecmilenio/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-tecmilenio/10 to-white pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative">
           <div className="text-center max-w-4xl mx-auto">
