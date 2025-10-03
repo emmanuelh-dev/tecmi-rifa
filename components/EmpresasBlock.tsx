@@ -69,10 +69,10 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
             {group.map(empresa => (
               <Dialog key={empresa.id}>
                 <DialogTrigger asChild>
-                  <div className="mx-4 flex-shrink-0">
-                    <Card className="w-64 cursor-pointer border-0 shadow-md hover:shadow-lg transition-all duration-300 transform group">
+                  <div className="mx-1 lg:mx-42 flex-shrink-0">
+                    <Card className=" w-32 lg:w-64 cursor-pointer border-0 shadow-md hover:shadow-lg transition-all duration-300 transform group">
                       <CardContent className="p-0 h-full">
-                        <div className="relative h-32 flex items-center justify-center overflow-hidden rounded-t-lg">
+                        <div className="relative h-16 lg:h-32 flex items-center justify-center overflow-hidden rounded-t-lg">
                           <img
                             src={empresa.logo || "/placeholder-logo.png"}
                             alt={`${empresa.nombreEmpresa} logo`}
