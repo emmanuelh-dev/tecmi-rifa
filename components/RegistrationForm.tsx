@@ -32,7 +32,7 @@ const formSchema = z.object({
     required_error: 'Selecciona el tipo de usuario',
   }),
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-  matricula: z.string().min(10, 'La matrícula debe tener al menos 10 caracteres'),
+  matricula: z.string().min(8, 'La matrícula debe tener al menos 8 caracteres'),
   semester: z.number()
     .min(1, 'El semestre debe estar entre 1 y 8')
     .max(8, 'El semestre debe estar entre 1 y 8'),
@@ -289,7 +289,7 @@ export default function RegistrationForm() {
 
               <Button
                 type="submit"
-                className="w-full bg-admin-blue text-white hover:bg-admin-blue focus:bg-admin-blue active:bg-admin-blue"
+                className="w-full"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Registrando...' : 'Registrar'}
