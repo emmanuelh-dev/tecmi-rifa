@@ -5,12 +5,12 @@ import { supabaseClient } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import MainLayout from '@/Layouts/MainLayout';
 import { Empresa } from '../types';
-import EmpresasBlock from '@/components/EmpresasBlock';
+import EmpresasFilter from '@/components/EmpresasFilter';
 
 export default function EmpresasPage() {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     const fetchEmpresas = async () => {
       try {
@@ -42,7 +42,7 @@ export default function EmpresasPage() {
       </section>
       <div>
 
-        <EmpresasBlock />
+        <EmpresasFilter />
       </div>
     </MainLayout >
   )
