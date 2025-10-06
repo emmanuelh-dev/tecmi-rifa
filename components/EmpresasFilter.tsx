@@ -65,7 +65,7 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
 
   return (
     <div className='max-w-6xl px-4 mx-auto'>
-      <div className="space-y-8 grid grid-cols-2 lg:grid-cols-4">
+      <div className="space-y-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="col-span-2 lg:col-span-4 flex items-center gap-4">
           <Input placeholder="Buscar por nombre..." onChange={e => setSearchTerm(e.target.value)} />
           <Select onValueChange={value => setSelectedCareer(value)} value={selectedCareer} defaultValue="all">
@@ -87,8 +87,8 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
         }).map((empresa, i) => (
           <Dialog key={empresa.id}>
             <DialogTrigger asChild>
-              <div className="mx-1 lg:mx-42 flex-shrink-0">
-                <Card className=" w-32 lg:w-64 cursor-pointer border-0 shadow-md hover:shadow-lg transition-all duration-300 transform group">
+              <div className="">
+                <Card className="w-full  lg:w-64 cursor-pointer border-0 shadow-md hover:shadow-lg transition-all duration-300 transform group">
                   <CardContent className="p-0 h-full">
                     <div className="relative h-16 lg:h-32 flex items-center justify-center overflow-hidden rounded-t-lg">
                       <img
