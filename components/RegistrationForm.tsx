@@ -96,7 +96,7 @@ export default function RegistrationForm() {
     try {
       // Inserta los datos en Supabase
       const { error } = await supabaseClient
-        .from('RegistroTecmi')
+        .from('sorteo')
         .insert([
           {
             name: values.name,

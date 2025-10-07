@@ -34,7 +34,7 @@ export default function WinnerPage() {
                 setIsLoading(true);
 
                 const { data, error } = await supabaseClient
-                    .from('RegistroTecmi')
+                    .from('sorteo')
                     .select('*');
 
                 if (error) throw error;

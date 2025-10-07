@@ -49,7 +49,7 @@ export default function AdminPage() {
 
     try {
       const { error } = await supabaseClient
-        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .from(type === 'student' ? 'sorteo' : 'RegistroEmpresas')
         .delete()
         .eq('id', id);
 
@@ -59,7 +59,7 @@ export default function AdminPage() {
 
       // Refresh data
       if (type === 'student') {
-        const { data } = await supabaseClient.from('RegistroTecmi').select('*');
+        const { data } = await supabaseClient.from('sorteo').select('*');
         if (data) {
           setStudents(data as Student[]);
           processChartData(data as Student[]);
@@ -88,7 +88,7 @@ export default function AdminPage() {
   const handleUpdate = async (type: 'student' | 'empresa', updatedData: any) => {
     try {
       const { error } = await supabaseClient
-        .from(type === 'student' ? 'RegistroTecmi' : 'RegistroEmpresas')
+        .from(type === 'student' ? 'sorteo' : 'RegistroEmpresas')
         .update(updatedData)
         .eq('id', updatedData.id);
 
@@ -98,7 +98,7 @@ export default function AdminPage() {
 
       // Refresh data
       if (type === 'student') {
-        const { data } = await supabaseClient.from('RegistroTecmi').select('*');
+        const { data } = await supabaseClient.from('sorteo').select('*');
         if (data) {
           setStudents(data as Student[]);
           processChartData(data as Student[]);
@@ -134,7 +134,7 @@ export default function AdminPage() {
         setIsLoading(true);
 
         const { data, error } = await supabaseClient
-          .from('RegistroTecmi')
+          .from('sorteo')
           .select('*');
 
         if (error) {
