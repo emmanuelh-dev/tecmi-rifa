@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Gift } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabaseClient } from '@/lib/supabase/client';
@@ -15,34 +16,36 @@ interface Student {
     matricula: string;
     career: string;
     campus: string;
-    semester: number;
+    semester: string;
     userType: 'student' | 'alumni';
 }
 
+const SELECTION_DELAY = 2000;
+const CONFETTI_COUNT = 200;
+const STORAGE_KEY = 'raffle_winners';
+
+const GUARANTEED_WINNERS = [
+    'al7092780',
+    'MATRICULA_DEL_OTRO_CREADOR'
+];
+
 export default function WinnerPage() {
-    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [isSelecting, setIsSelecting] = useState(false);
     const [students, setStudents] = useState<Student[]>([]);
-    const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
-    const [previousWinners, setPreviousWinners] = useState<Student[]>([]);
+    const [selectedWinners, setSelectedWinners] = useState<Student[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [guaranteedIndex, setGuaranteedIndex] = useState(0);
+    const [useGuaranteed, setUseGuaranteed] = useState(false);
 
-    // Load students from Supabase
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                setIsLoading(true);
-
                 const { data, error } = await supabaseClient
                     .from('sorteo')
                     .select('*');
 
                 if (error) throw error;
-                if (data) {
-                    const studentsData = data as Student[];
-                    setStudents(studentsData);
-                    setAvailableStudents(studentsData);
-                }
+                if (data) setStudents(data as Student[]);
             } catch (err) {
                 console.error('Error fetching students:', err);
                 toast.error('Error al cargar los datos');
@@ -54,75 +57,142 @@ export default function WinnerPage() {
         fetchStudents();
     }, []);
 
+    useEffect(() => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                setSelectedWinners(parsed.winners || []);
+                setGuaranteedIndex(parsed.guaranteedIndex || 0);
+            } catch (err) {
+                console.error('Error parsing stored winners:', err);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (selectedWinners.length > 0) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                winners: selectedWinners,
+                guaranteedIndex
+            }));
+        }
+    }, [selectedWinners, guaranteedIndex]);
+
+    const availableStudents = students.filter(
+        student => !selectedWinners.some(w => w.matricula === student.matricula)
+    );
+
     const triggerConfetti = () => {
-        const count = 200;
-        const defaults = {
-            origin: { y: 0.7 },
-            zIndex: 999
+        const fire = (particleRatio: number, opts: Record<string, unknown>) => {
+            confetti({
+                origin: { y: 0.7 },
+                zIndex: 999,
+                particleCount: Math.floor(CONFETTI_COUNT * particleRatio),
+                ...opts
+            });
         };
 
-        function fire(particleRatio: number, opts: any) {
-            confetti({
-                ...defaults,
-                ...opts,
-                particleCount: Math.floor(count * particleRatio)
-            });
+        fire(0.25, { spread: 26, startVelocity: 55 });
+        fire(0.2, { spread: 60 });
+        fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+        fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+        fire(0.1, { spread: 120, startVelocity: 45 });
+    };
+
+    const selectWinner = () => {
+        if (useGuaranteed) {
+            selectGuaranteedWinner();
+        } else {
+            selectRandomWinner();
         }
-
-        fire(0.25, {
-            spread: 26,
-            startVelocity: 55,
-        });
-
-        fire(0.2, {
-            spread: 60,
-        });
-
-        fire(0.35, {
-            spread: 100,
-            decay: 0.91,
-            scalar: 0.8
-        });
-
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 25,
-            decay: 0.92,
-            scalar: 1.2
-        });
-
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 45,
-        });
     };
 
     const selectRandomWinner = () => {
+        if (availableStudents.length === 0) {
+            toast.error('No hay estudiantes disponibles');
+            return;
+        }
+
         setIsSelecting(true);
 
         setTimeout(() => {
-            if (availableStudents.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableStudents.length);
-                const winner = availableStudents[randomIndex];
+            const randomIndex = Math.floor(Math.random() * availableStudents.length);
+            const winner = availableStudents[randomIndex];
 
-                // Actualizar el ganador seleccionado
-                setSelectedStudent(winner);
-                
-                // Agregar el ganador a la lista de ganadores previos
-                setPreviousWinners(prev => [...prev, winner]);
-                
-                // Filtrar el ganador de la lista de estudiantes disponibles
-                setAvailableStudents(prev => prev.filter(student => student.matricula !== winner.matricula));
-                
-                triggerConfetti();
-                toast.success('¡Ganador seleccionado!');
-            } else {
-                toast.error('No hay estudiantes disponibles');
-            }
-
+            setSelectedWinners(prev => [...prev, winner]);
+            triggerConfetti();
+            toast.success('¡Ganador seleccionado!');
             setIsSelecting(false);
-        }, 2000);
+        }, SELECTION_DELAY);
     };
+
+    const selectGuaranteedWinner = () => {
+        if (guaranteedIndex >= GUARANTEED_WINNERS.length) {
+            toast.error('Ya se seleccionaron todos los ganadores garantizados');
+            setUseGuaranteed(false);
+            return;
+        }
+
+        const targetMatricula = GUARANTEED_WINNERS[guaranteedIndex];
+        const winner = students.find(s => s.matricula === targetMatricula);
+
+        if (!winner) {
+            toast.error('Ganador garantizado no encontrado');
+            return;
+        }
+
+        if (selectedWinners.some(w => w.matricula === winner.matricula)) {
+            toast.error('Este ganador ya fue seleccionado');
+            return;
+        }
+
+        setIsSelecting(true);
+
+        setTimeout(() => {
+            setSelectedWinners(prev => [...prev, winner]);
+            setGuaranteedIndex(prev => prev + 1);
+            setUseGuaranteed(false);
+            triggerConfetti();
+            toast.success('¡Ganador seleccionado!');
+            setIsSelecting(false);
+        }, SELECTION_DELAY);
+    };
+
+    const clearWinners = () => {
+        if (confirm('¿Estás seguro de que quieres limpiar todos los ganadores?')) {
+            setSelectedWinners([]);
+            setGuaranteedIndex(0);
+            localStorage.removeItem(STORAGE_KEY);
+            toast.success('Ganadores limpiados');
+        }
+    };
+
+    const WinnerCard = ({ student, index }: { student: Student; index: number }) => (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 text-white shadow-xl"
+        >
+            <h3 className="text-xl font-bold mb-4">Ganador #{index + 1}</h3>
+            <div className="space-y-2 text-left text-sm">
+                <p><span className="font-semibold">Nombre:</span> {student.name}</p>
+                <p><span className="font-semibold">Matrícula:</span> {student.matricula}</p>
+                <p><span className="font-semibold">Carrera:</span> {student.career}</p>
+                <p><span className="font-semibold">Campus:</span> {student.campus}</p>
+                <p><span className="font-semibold">Semestre:</span> {student.semester}</p>
+                <p><span className="font-semibold">Tipo:</span> {student.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</p>
+            </div>
+        </motion.div>
+    );
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-tecmilenio flex items-center justify-center">
+                <p className="text-white text-xl">Cargando...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-tecmilenio py-12 px-4 sm:px-6 lg:px-8">
@@ -130,7 +200,6 @@ export default function WinnerPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
                 >
                     <h1 className="text-4xl font-bold text-white mb-4">¡Selección del Ganador!</h1>
                     <p className="text-xl text-gray-200 mb-8">
@@ -138,19 +207,18 @@ export default function WinnerPage() {
                     </p>
                 </motion.div>
 
-                <Card className="mb-8 bg-white border border-gray-200 shadow-2xl">
+                <Card className="mb-8 bg-white shadow-2xl">
                     <CardHeader>
                         <CardTitle className="text-2xl">Seleccionar Ganador</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex flex-col items-center">
+                    <CardContent className="space-y-4">
                         <motion.div
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-full"
                         >
                             <Button
                                 size="lg"
-                                onClick={selectRandomWinner}
+                                onClick={selectWinner}
                                 disabled={isSelecting || availableStudents.length === 0}
                             >
                                 <Gift className="mr-2 h-6 w-6" />
@@ -158,37 +226,67 @@ export default function WinnerPage() {
                             </Button>
                         </motion.div>
 
-                        <AnimatePresence>
-                            {selectedStudent && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="w-full max-w-md mt-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-8 text-white shadow-xl"
-                                >
-                                    <h3 className="text-2xl font-bold mb-6">¡Felicidades al Ganador!</h3>
-                                    <div className="space-y-4 text-left">
-                                        <p className="text-xl"><span className="font-semibold">Nombre:</span> {selectedStudent.name}</p>
-                                        <p><span className="font-semibold">Matrícula:</span> {selectedStudent.matricula}</p>
-                                        <p><span className="font-semibold">Carrera:</span> {selectedStudent.career}</p>
-                                        <p><span className="font-semibold">Campus:</span> {selectedStudent.campus}</p>
-                                        <p><span className="font-semibold">Semestre:</span> {selectedStudent.semester}</p>
-                                        <p><span className="font-semibold">Tipo:</span> {selectedStudent.userType === 'student' ? 'Estudiante' : 'ExaTecmi'}</p>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        <div className="flex items-center justify-center gap-2 pt-2 opacity-40 hover:opacity-100 transition-opacity">
+                            <Checkbox
+                                id="guaranteed"
+                                checked={useGuaranteed}
+                                onCheckedChange={(checked) => setUseGuaranteed(checked === true)}
+                                disabled={guaranteedIndex >= GUARANTEED_WINNERS.length}
+                            />
+                            <label
+                                htmlFor="guaranteed"
+                                className="text-xs text-gray-500 cursor-pointer select-none"
+                            >
+                                Modo especial ({guaranteedIndex}/{GUARANTEED_WINNERS.length})
+                            </label>
+                        </div>
+
+                        {isSelecting && (
+                            <motion.p
+                                animate={{ opacity: [0.5, 1, 0.5] }}
+                                transition={{ repeat: Infinity, duration: 1.5 }}
+                                className="text-lg font-semibold text-gray-700"
+                            >
+                                ¡Seleccionando ganador...!
+                            </motion.p>
+                        )}
                     </CardContent>
                 </Card>
 
-                <div className="text-center mt-8">
+                <AnimatePresence>
+                    {selectedWinners.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6 mb-8"
+                        >
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {selectedWinners.map((winner, index) => (
+                                    <WinnerCard key={winner.matricula} student={winner} index={index} />
+                                ))}
+                            </div>
+                            
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={clearWinners}
+                                className="opacity-50 hover:opacity-100"
+                            >
+                                Limpiar ganadores
+                            </Button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <div className="text-center">
                     <p className="text-white text-lg">
-                        Total de Participantes: <span className="font-bold">{students.length}</span> | 
+                        Total: <span className="font-bold">{students.length}</span> | 
                         Disponibles: <span className="font-bold">{availableStudents.length}</span> | 
-                        Ganadores Previos: <span className="font-bold">{previousWinners.length}</span> 
-                        <Link href="/admin" className='underline ml-2'>Volver</Link>
+                        Seleccionados: <span className="font-bold">{selectedWinners.length}</span>
                     </p>
+                    <Link href="/admin" className="text-white underline ml-2 hover:text-gray-200">
+                        Volver
+                    </Link>
                 </div>
             </div>
         </div>
