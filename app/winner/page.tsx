@@ -26,7 +26,7 @@ const STORAGE_KEY = 'raffle_winners';
 
 const GUARANTEED_WINNERS = [
     'al7092780',
-    'MATRICULA_DEL_OTRO_CREADOR'
+    'AL07038463'
 ];
 
 export default function WinnerPage() {
