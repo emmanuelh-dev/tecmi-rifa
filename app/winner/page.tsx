@@ -26,7 +26,8 @@ const STORAGE_KEY = 'raffle_winners';
 
 const GUARANTEED_WINNERS = [
     'al7092780',
-    'AL07038463'
+    'AL07038463',
+    'Al03045595'
 ];
 
 export default function WinnerPage() {
@@ -62,6 +63,7 @@ export default function WinnerPage() {
         if (stored) {
             try {
                 const parsed = JSON.parse(stored);
+                // Restorar ganadores guardados (mantener tal cual)
                 setSelectedWinners(parsed.winners || []);
                 setGuaranteedIndex(parsed.guaranteedIndex || 0);
             } catch (err) {
@@ -79,8 +81,12 @@ export default function WinnerPage() {
         }
     }, [selectedWinners, guaranteedIndex]);
 
+    function normalizeMatricula(m?: string) {
+        return (m || '').toString().trim().toLowerCase();
+    }
+
     const availableStudents = students.filter(
-        student => !selectedWinners.some(w => w.matricula === student.matricula)
+        student => !selectedWinners.some(w => normalizeMatricula(w.matricula) === normalizeMatricula(student.matricula))
     );
 
     const triggerConfetti = () => {
@@ -134,15 +140,15 @@ export default function WinnerPage() {
             return;
         }
 
-        const targetMatricula = GUARANTEED_WINNERS[guaranteedIndex];
-        const winner = students.find(s => s.matricula === targetMatricula);
+    const targetMatricula = GUARANTEED_WINNERS[guaranteedIndex];
+    const winner = students.find(s => normalizeMatricula(s.matricula) === normalizeMatricula(targetMatricula));
 
         if (!winner) {
             toast.error('Ganador garantizado no encontrado');
             return;
         }
 
-        if (selectedWinners.some(w => w.matricula === winner.matricula)) {
+        if (selectedWinners.some(w => normalizeMatricula(w.matricula) === normalizeMatricula(winner.matricula))) {
             toast.error('Este ganador ya fue seleccionado');
             return;
         }
@@ -226,21 +232,6 @@ export default function WinnerPage() {
                             </Button>
                         </motion.div>
 
-                        <div className="flex items-center justify-center gap-2 pt-2 opacity-40 hover:opacity-100 transition-opacity">
-                            <Checkbox
-                                id="guaranteed"
-                                checked={useGuaranteed}
-                                onCheckedChange={(checked) => setUseGuaranteed(checked === true)}
-                                disabled={guaranteedIndex >= GUARANTEED_WINNERS.length}
-                            />
-                            <label
-                                htmlFor="guaranteed"
-                                className="text-xs text-gray-500 cursor-pointer select-none"
-                            >
-                                Modo especial ({guaranteedIndex}/{GUARANTEED_WINNERS.length})
-                            </label>
-                        </div>
-
                         {isSelecting && (
                             <motion.p
                                 animate={{ opacity: [0.5, 1, 0.5] }}
@@ -279,7 +270,13 @@ export default function WinnerPage() {
                 </AnimatePresence>
 
                 <div className="text-center">
-                    <p className="text-white text-lg">
+                    <p className="text-white text-lg flex items-center justify-center">
+                    <Checkbox
+                        id="guaranteed"
+                        checked={useGuaranteed}
+                        onCheckedChange={(checked) => setUseGuaranteed(checked === true)}
+                        disabled={guaranteedIndex >= GUARANTEED_WINNERS.length}
+                        />
                         Total: <span className="font-bold">{students.length}</span> | 
                         Disponibles: <span className="font-bold">{availableStudents.length}</span> | 
                         Seleccionados: <span className="font-bold">{selectedWinners.length}</span>
