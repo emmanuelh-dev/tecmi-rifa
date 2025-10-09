@@ -26,7 +26,6 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { supabaseClient } from '@/lib/supabase/client';
 
-//AQUI ERA EL ERRO DE LAS VALIDACIO----------------------------------------------------------------------------------------------------
 const formSchema = z.object({
   userType: z.enum(['student', 'alumni'], {
     required_error: 'Selecciona el tipo de usuario',
@@ -38,8 +37,8 @@ const formSchema = z.object({
     .max(8, 'El semestre debe estar entre 1 y 8'),
   career: z.string().min(1, 'Selecciona una carrera'),
   campus: z.string().min(1, 'Selecciona un campus'),
-  whatsapp: z.string().optional(), // WhatsApp es opcional por defecto
-  email: z.string().optional(), // Email es opcional por defecto
+  whatsapp: z.string().optional(), 
+  email: z.string().optional(),
 })
   .superRefine((data, ctx) => {
     // Validación condicional para alumni
@@ -70,9 +69,6 @@ const formSchema = z.object({
     }
   });
 
-//-------------------------------------------------------------------------------
-
-
 export default function RegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -90,11 +86,9 @@ export default function RegistrationForm() {
       email: '',
     },
   });
-  // Función para manejar el envío del formulario
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // Inserta los datos en Supabase
       const { error } = await supabaseClient
         .from('sorteo')
         .insert([
@@ -104,9 +98,9 @@ export default function RegistrationForm() {
             semester: values.semester,
             career: values.career,
             campus: values.campus,
-            userType: values.userType, // Se agrega userType
-            whatsapp: values.whatsapp || null, // Si está vacío, se guarda como NULL
-            email: values.email || null, // Si está vacío, se guarda como NULL
+            userType: values.userType,
+            whatsapp: values.whatsapp || null,
+            email: values.email || null,
           },
         ]);
 
@@ -115,7 +109,7 @@ export default function RegistrationForm() {
       }
 
       localStorage.setItem('userCareer', values.career);
-      router.push('/ofertaTrabajo'); // Redirige al usuario a la página de ofertas de empleo
+      router.push('/empresas?career=' + values.career);
 
       toast.success('¡Registro exitoso! Estás participando en la rifa');
       form.reset();

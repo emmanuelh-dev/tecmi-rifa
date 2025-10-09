@@ -11,6 +11,7 @@ import { Marquee } from './ui/marquees';
 import { Input } from './ui/input';
 import { Select } from '@radix-ui/react-select';
 import { SelectContent, SelectItem, SelectTrigger } from './ui/select';
+import { useParams } from 'next/navigation';
 
 const REQUIRED_FIELDS = 'id,nombreEmpresa,logo,carreraBuscada,descripcion';
 
@@ -61,7 +62,6 @@ export default function EmpresasBlock({ limit }: { limit?: number }) {
     { length: Math.ceil(empresas.length / 4) },
     (_, i) => empresas.slice(i * 4, i * 4 + 4)
   );
-  console.log({ searchTerm, selectedCareer });
 
   return (
     <div className='max-w-6xl px-4 mx-auto'>
