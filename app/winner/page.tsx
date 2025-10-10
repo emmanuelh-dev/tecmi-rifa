@@ -20,7 +20,7 @@ interface Student {
     userType: 'student' | 'alumni';
 }
 
-const SELECTION_DELAY = 2000;
+const SELECTION_DELAY = 600;
 const CONFETTI_COUNT = 200;
 const STORAGE_KEY = 'raffle_winners';
 
@@ -252,8 +252,8 @@ export default function WinnerPage() {
                             className="space-y-6 mb-8"
                         >
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {selectedWinners.map((winner, index) => (
-                                    <WinnerCard key={winner.matricula} student={winner} index={index} />
+                                {[...selectedWinners].reverse().map((winner, index) => (
+                                    <WinnerCard key={winner.matricula} student={winner} index={(selectedWinners.length - index )+ 1} />
                                 ))}
                             </div>
                             
